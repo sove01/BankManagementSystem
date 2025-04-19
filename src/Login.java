@@ -2,27 +2,29 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.URL;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class Login extends JFrame implements ActionListener {
     JLabel welcomeLabel, cardNumberLabel, pinLabel;
     JTextField cardNumber;
-    JPasswordField password;
+    JPasswordField PIN;
     JButton button1, button2, button3;
 
     Login() {
         //Bank icon
         super("Login System");
         ImageIcon bankIcon = new ImageIcon("src/Images/bank.png");
-            Image image = bankIcon.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
+        Image image = bankIcon.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
         ImageIcon icon = new ImageIcon(image);
         JLabel bankLabel = new JLabel(icon);
-                bankLabel.setBounds(350, 10, 120, 120);
+        bankLabel.setBounds(350, 10, 120, 120);
         add(bankLabel);
 
         //Card icon
         ImageIcon cardIcon = new ImageIcon("src/Images/card.png");
-            Image image2  = cardIcon.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
+        Image image2 = cardIcon.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
         ImageIcon icon2 = new ImageIcon(image2);
         JLabel cardLabel = new JLabel(icon2);
         cardLabel.setBounds(650, 100, 120, 120);
@@ -57,16 +59,16 @@ public class Login extends JFrame implements ActionListener {
         add(pinLabel);
 
 
-        //Password
-        password = new JPasswordField(20);
-        password.setBounds(310, 250, 230, 30);
-        password.setFont(new Font("Tahoma", Font.BOLD, 12));
-        password.setForeground(Color.WHITE);
-        add(password);
+        //PIN
+        PIN = new JPasswordField(20);
+        PIN.setBounds(310, 250, 230, 30);
+        PIN.setFont(new Font("Tahoma", Font.BOLD, 12));
+        PIN.setForeground(Color.WHITE);
+        add(PIN);
 
         //Login button
         button1 = new JButton("Login");
-        button1.setBounds(275,300,300,30);
+        button1.setBounds(275, 300, 300, 30);
         button1.setFont(new Font("Tahoma", Font.BOLD, 12));
         button1.setForeground(Color.BLACK);
         button1.addActionListener(this);
@@ -74,7 +76,7 @@ public class Login extends JFrame implements ActionListener {
 
         //Clear  button
         button2 = new JButton("Clear");
-        button2.setBounds(275,400,300,30);
+        button2.setBounds(275, 400, 300, 30);
         button2.setFont(new Font("Tahoma", Font.BOLD, 12));
         button2.setForeground(Color.BLACK);
         button2.addActionListener(this);
@@ -100,7 +102,7 @@ public class Login extends JFrame implements ActionListener {
         //Frame properties
         setLayout(null);
         setSize(850, 480);
-        setLocation(450,200);
+        setLocation(450, 200);
         setUndecorated(true);
         setVisible(true);
 
@@ -108,6 +110,40 @@ public class Login extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        try {
+            if (e.getSource() == button1) {
+                Conn conn = new Conn();
+                String cardNum = cardNumber.getText();
+                String pin = PIN.getText();
+
+                //SQlite prepared statement to prevent sql injection
+                String query = "SELECT * FROM login WHERE card_number = ? AND pin = ?";
+
+                //Prepare the statement and execute
+                PreparedStatement pstmt = conn.con.prepareStatement(query);
+                pstmt.setString(1, cardNum);
+                pstmt.setString(2, pin);
+
+                ResultSet rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    setVisible(false);
+                    new ATM(pin);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Incorrect Card Number or PIN");
+                }
+
+            } else if (e.getSource() == button2) {
+                cardNumber.setText("");
+                PIN.setText("");
+            } else if (e.getSource() == button3) {
+                new SignUp();
+                setVisible(false);
+
+            }
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+            ex.printStackTrace();
+        }
 
     }
 
