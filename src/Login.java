@@ -5,9 +5,9 @@ import java.awt.event.ActionListener;
 import java.net.URL;
 
 public class Login extends JFrame implements ActionListener {
-    JLabel label1, label2, label3;
-    JTextField text1;
-    JPasswordField password3;
+    JLabel welcomeLabel, cardNumberLabel, pinLabel;
+    JTextField cardNumber;
+    JPasswordField password;
     JButton button1, button2, button3;
 
     Login() {
@@ -27,6 +27,48 @@ public class Login extends JFrame implements ActionListener {
         JLabel cardLabel = new JLabel(icon2);
         cardLabel.setBounds(670, 350, 120, 120);
         add(cardLabel);
+
+        //Welcome label
+        welcomeLabel = new JLabel("Welcome to ATM");
+        welcomeLabel.setBounds(230, 125, 450, 40);
+        welcomeLabel.setFont(new Font("Tahoma", Font.BOLD, 12));
+        welcomeLabel.setForeground(Color.BLACK);
+        add(welcomeLabel);
+
+        //Card number label
+        cardNumberLabel = new JLabel("Card Number: ");
+        cardNumberLabel.setBounds(150, 190, 375, 30);
+        cardNumberLabel.setFont(new Font("Tahoma", Font.BOLD, 12));
+        cardNumberLabel.setForeground(Color.BLACK);
+        add(cardNumberLabel);
+
+        //Card number
+        cardNumber = new JTextField(15);
+        cardNumber.setBounds(325, 190, 230, 30);
+        cardNumber.setFont(new Font("Tahoma", Font.BOLD, 12));
+        cardNumber.setForeground(Color.WHITE);
+        add(cardNumber);
+
+        //PIN label
+        pinLabel = new JLabel("PIN: ");
+        pinLabel.setBounds(150, 250, 375, 30);
+        pinLabel.setFont(new Font("Tahoma", Font.BOLD, 12));
+        pinLabel.setForeground(Color.BLACK);
+        add(pinLabel);
+
+
+        //Password
+        password = new JPasswordField(20);
+        password.setBounds(325, 250, 230, 30);
+        password.setFont(new Font("Tahoma", Font.BOLD, 12));
+        password.setForeground(Color.WHITE);
+        add(password);
+
+
+
+
+
+
     }
 
     @Override
