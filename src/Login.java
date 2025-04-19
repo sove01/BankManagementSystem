@@ -64,10 +64,45 @@ public class Login extends JFrame implements ActionListener {
         password.setForeground(Color.WHITE);
         add(password);
 
+        //Login button
+        button1 = new JButton("Login");
+        button1.setBounds(300,300,300,30);
+        button1.setFont(new Font("Tahoma", Font.BOLD, 12));
+        button1.setForeground(Color.BLACK);
+        button1.addActionListener(this);
+        add(button1);
+
+        //Clear  button
+        button2 = new JButton("Login");
+        button2.setBounds(450,300,100,30);
+        button2.setFont(new Font("Tahoma", Font.BOLD, 12));
+        button2.setForeground(Color.BLACK);
+        button2.addActionListener(this);
+        add(button2);
+
+        //Sign up button
+        button3 = new JButton("Sign up");
+        button3.setBounds(300, 350, 210, 30);
+        button3.setFont(new Font("Tahoma", Font.BOLD, 12));
+        button3.setForeground(Color.BLACK);
+        button3.addActionListener(this);
+        add(button3);
+
+        //Background
+        ImageIcon background = new ImageIcon("src/Images/background.png");
+        Image bg = background.getImage().getScaledInstance(850, 480, Image.SCALE_SMOOTH);
+        ImageIcon background2 = new ImageIcon(bg);
+        JLabel backgroundLabel = new JLabel(background2);
+        backgroundLabel.setBounds(0, 0, 850, 480);
+        add(backgroundLabel);
 
 
-
-
+        //Frame properties
+        setLayout(null);
+        setSize(850, 480);
+        setLocation(450,200);
+        setUndecorated(true);
+        setVisible(true);
 
     }
 
