@@ -26,130 +26,130 @@ public class SignUp extends JFrame implements ActionListener {
 
         //Application number label
         JLabel applicationNumber = new JLabel("APPLICATION NUMBER" + aN);
-        applicationNumber.setBounds(180, 20, 600, 40);
-        applicationNumber.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        applicationNumber.setBounds(250, 20, 600, 60);
+        applicationNumber.setFont(new Font("Times New Roman", Font.PLAIN, 30));
         add(applicationNumber);
 
         //Page 1 label
         JLabel page1 = new JLabel("Page 1");
-        page1.setBounds(360, 70, 600, 30);
-        page1.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        page1.setBounds(380, 70, 600, 45);
+        page1.setFont(new Font("Times New Roman", Font.PLAIN, 25));
         add(page1);
 
         //Personal information label
         JLabel personalInformation = new JLabel("Personal Information");
-        personalInformation.setBounds(320, 90, 600, 30);
-        personalInformation.setFont(new Font("Times New Roman", Font.BOLD, 20));
+        personalInformation.setBounds(100, 140, 600, 40);
+        personalInformation.setFont(new Font("Times New Roman", Font.BOLD, 25));
         add(personalInformation);
 
-        //Name label
+        //First name label
         JLabel firstName = new JLabel("First Name");
         firstName.setBounds(100, 190, 100, 30);
-        firstName.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        firstName.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         add(firstName);
 
         //First name field
         firstNameText = new JTextField();
-        firstNameText.setBounds(300, 190, 100, 30);
-        firstNameText.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        firstNameText.setBounds(200, 190, 100, 30);
+        firstNameText.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         add(firstNameText);
 
         //Last name label
         JLabel lastName = new JLabel("Last Name");
-        lastName.setBounds(150, 190, 100, 30);
-        lastName.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        lastName.setBounds(100, 240, 100, 30);
+        lastName.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         add(lastName);
 
         //Last name field
         lastNameText = new JTextField();
-        lastNameText.setBounds(350, 190, 100, 30);
-        lastNameText.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        lastNameText.setBounds(200, 240, 100, 30);
+        lastNameText.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         add(lastNameText);
 
         //Email label
         JLabel email = new JLabel("Email");
-        email.setBounds(200, 190, 100, 30);
-        email.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        email.setBounds(100, 290, 100, 30);
+        email.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         add(email);
 
         //Email field
         emailText = new JTextField();
-        emailText.setBounds(400, 190, 100, 30);
-        emailText.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        emailText.setBounds(200, 290, 100, 30);
+        emailText.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         add(emailText);
 
         //Gender label
         JLabel gender = new JLabel("Gender");
-        gender.setBounds(250, 190, 100, 30);
-        gender.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        gender.setBounds(100, 340, 100, 30);
+        gender.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         add(gender);
 
         //Gender field
         genderText = new JTextField();
-        genderText.setBounds(450, 190, 100, 30);
-        genderText.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        genderText.setBounds(200, 340, 100, 30);
+        genderText.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         add(genderText);
 
         //Nationality label
         JLabel nationality = new JLabel("Nationality");
-        nationality.setBounds(300, 190, 100, 30);
-        nationality.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        nationality.setBounds(100, 390, 100, 30);
+        nationality.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         add(nationality);
 
         //Nationality field
         nationalityText = new JTextField();
-        nationalityText.setBounds(500, 190, 100, 30);
-        nationalityText.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        nationalityText.setBounds(200, 390, 100, 30);
+        nationalityText.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         add(nationalityText);
 
         //Region label
         JLabel region = new JLabel("Region");
-        region.setBounds(350, 190, 100, 30);
-        region.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        region.setBounds(100, 440, 100, 30);
+        region.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         add(region);
 
         //Region field
         regionText = new JTextField();
-        regionText.setBounds(550, 190, 100, 30);
-        regionText.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        regionText.setBounds(200, 440, 100, 30);
+        regionText.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         add(regionText);
 
         //City label
         JLabel city = new JLabel("City");
-        city.setBounds(400, 190, 100, 30);
-        city.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        city.setBounds(100, 490, 100, 30);
+        city.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         add(city);
         //City field
         cityText = new JTextField();
-        cityText.setBounds(600, 190, 100, 30);
-        cityText.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        cityText.setBounds(200, 490, 100, 30);
+        cityText.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         add(cityText);
 
         //Marital status label
         JLabel maritalStatus = new JLabel("Marital Status :");
-        maritalStatus.setFont(new Font("Raleway", Font.BOLD, 20));
-        maritalStatus.setBounds(100, 440, 200, 30);
+        maritalStatus.setFont(new Font("Raleway", Font.BOLD, 15));
+        maritalStatus.setBounds(100, 540, 200, 30);
         add(maritalStatus);
 
         //Married button
         marriedButton = new JRadioButton("Married");
-        marriedButton.setBounds(300, 440, 100, 30);
+        marriedButton.setBounds(250, 540, 100, 30);
         marriedButton.setBackground(new Color(222, 255, 228));
-        marriedButton.setFont(new Font("Raleway", Font.BOLD, 14));
+        marriedButton.setFont(new Font("Raleway", Font.BOLD, 15));
         add(marriedButton);
 
         //Unmarried button
         unmarriedButton = new JRadioButton("Unmarried");
         unmarriedButton.setBackground(new Color(222, 255, 228));
-        unmarriedButton.setBounds(450, 440, 100, 30);
-        unmarriedButton.setFont(new Font("Raleway", Font.BOLD, 14));
+        unmarriedButton.setBounds(400, 540, 100, 30);
+        unmarriedButton.setFont(new Font("Raleway", Font.BOLD, 15));
         add(unmarriedButton);
 
         //Other button
         otherButton = new JRadioButton("Other");
         otherButton.setBackground(new Color(222, 255, 228));
-        otherButton.setBounds(635, 440, 100, 30);
-        otherButton.setFont(new Font("Raleway", Font.BOLD, 14));
+        otherButton.setBounds(550, 540, 100, 30);
+        otherButton.setFont(new Font("Raleway", Font.BOLD, 15));
         add(otherButton);
 
 
@@ -160,20 +160,20 @@ public class SignUp extends JFrame implements ActionListener {
 
         //PIN label
         JLabel pin = new JLabel("PIN");
-        pin.setBounds(300, 590, 200, 30);
-        pin.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        pin.setBounds(100, 590, 200, 30);
+        pin.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         add(pin);
 
         //PIN field
         pinText = new JTextField();
-        pinText.setBounds(400, 590, 100, 30);
-        pinText.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        pinText.setBounds(200, 590, 100, 30);
+        pinText.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         add(pinText);
 
         //Next
         nextSignUp = new JButton("Next");
-        nextSignUp.setBounds(620, 720, 80, 30);
-        nextSignUp.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        nextSignUp.setBounds(750, 720, 80, 30);
+        nextSignUp.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         nextSignUp.setBackground(Color.BLACK);
         nextSignUp.setForeground(Color.WHITE);
         nextSignUp.addActionListener(this);
