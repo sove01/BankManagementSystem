@@ -48,7 +48,8 @@ public class Login extends JFrame implements ActionListener {
         cardNumber = new JTextField(15);
         cardNumber.setBounds(310, 190, 230, 30);
         cardNumber.setFont(new Font("Tahoma", Font.BOLD, 12));
-        cardNumber.setForeground(Color.WHITE);
+        cardNumber.setForeground(Color.BLACK);
+        cardNumber.setBackground(Color.WHITE);
         add(cardNumber);
 
         //PIN label
@@ -63,7 +64,8 @@ public class Login extends JFrame implements ActionListener {
         PIN = new JPasswordField(20);
         PIN.setBounds(310, 250, 230, 30);
         PIN.setFont(new Font("Tahoma", Font.BOLD, 12));
-        PIN.setForeground(Color.WHITE);
+        PIN.setForeground(Color.BLACK);
+        PIN.setBackground(Color.WHITE);
         add(PIN);
 
         //Login button
@@ -103,7 +105,6 @@ public class Login extends JFrame implements ActionListener {
         setLayout(null);
         setSize(850, 480);
         setLocation(450, 200);
-        setUndecorated(true);
         setVisible(true);
 
     }
@@ -124,13 +125,13 @@ public class Login extends JFrame implements ActionListener {
                 pstmt.setString(1, cardNum);
                 pstmt.setString(2, pin);
 
-                ResultSet rs = pstmt.executeQuery();
-                if (rs.next()) {
-                    setVisible(false);
-                    new ATM(pin);
-                } else {
-                    JOptionPane.showMessageDialog(null, "Incorrect Card Number or PIN");
-                }
+//                ResultSet rs = pstmt.executeQuery();
+//                if (rs.next()) {
+//                    setVisible(false);
+//                    new ATM(pin);
+//                } else {
+//                    JOptionPane.showMessageDialog(null, "Incorrect Card Number or PIN");
+//                }
 
             } else if (e.getSource() == button2) {
                 cardNumber.setText("");
@@ -142,7 +143,7 @@ public class Login extends JFrame implements ActionListener {
             }
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
-            ex.printStackTrace();
+//            ex.printStackTrace();
         }
 
     }

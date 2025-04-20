@@ -2,10 +2,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Random;
 
 public class SignUp extends JFrame implements ActionListener {
-    JRadioButton marriedButton, unmarriedButton, otherButton;
+    JRadioButton marriedButton, unmarriedButton, otherButton, maleButton, femaleButton, otherGenderButton;
     JButton nextSignUp;
     JTextField lastNameText, firstNameText, emailText, genderText, nationalityText, regionText, cityText, pinText;
 
@@ -84,11 +86,20 @@ public class SignUp extends JFrame implements ActionListener {
         gender.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         add(gender);
 
-        //Gender field
-        genderText = new JTextField();
-        genderText.setBounds(200, 340, 100, 30);
-        genderText.setFont(new Font("Times New Roman", Font.PLAIN, 15));
-        add(genderText);
+        //Gender Options
+        maleButton = new JRadioButton("Male");
+        setBounds(200, 340, 100, 30);
+        maleButton.setFont(new Font("Times New Roman", Font.BOLD, 15));
+        add(maleButton);
+        femaleButton = new JRadioButton("Female");
+        femaleButton.setBounds(300, 340, 100, 30);
+        femaleButton.setFont(new Font("Times New Roman", Font.BOLD, 15));
+        add(femaleButton);
+        otherGenderButton = new JRadioButton("Other gender ( gay as hell )");
+        otherGenderButton.setBounds(400, 340, 100, 30);
+        otherGenderButton.setFont(new Font("Times New Roman", Font.BOLD, 15));
+        add(otherGenderButton);
+
 
         //Nationality label
         JLabel nationality = new JLabel("Nationality");
@@ -179,7 +190,7 @@ public class SignUp extends JFrame implements ActionListener {
         nextSignUp.addActionListener(this);
         add(nextSignUp);
 
-        getContentPane().setBackground(new Color(222, 255, 228));
+        getContentPane().setBackground(new Color(70, 107, 236));
         setLayout(null);
         setSize(850, 800);
         setLocation(360, 40);
@@ -187,8 +198,76 @@ public class SignUp extends JFrame implements ActionListener {
 
     }
 
+
     @Override
     public void actionPerformed(ActionEvent e) {
+        double balance = 0; // intial balance
+        String formNumber = aN;
+        String lastName = lastNameText.getText();
+        String firstName = firstNameText.getText();
+        String email = emailText.getText();
+        String nationality = nationalityText.getText();
+        String region = regionText.getText();
+        String city = cityText.getText();
+        String gender = null;
+        String maritalStatus = null;
+
+        if (maleButton.isSelected()) {
+            gender = "Male";
+        } else if (femaleButton.isSelected()) {
+            gender = "Female";
+        } else if (otherGenderButton.isSelected()) {
+            gender = "Other";
+        }
+
+        if (marriedButton.isSelected()) {
+            maritalStatus = "Married";
+        } else if (unmarriedButton.isSelected()) {
+            maritalStatus = "Unmarried";
+        } else if (otherButton.isSelected()) {
+            maritalStatus = "Other";
+        }
+
+        //to validate required fields
+        try {
+            if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || nationality.isEmpty() || region.isEmpty() || city.isEmpty() || gender == null || maritalStatus == null)
+                ;
+            JOptionPane.showMessageDialog(null, "Please fill out everything in the form");
+            return;
+        }
+
+        //Random card number and pin generator
+        String cNumGen = String.format("%04d-%04d-%04d-%04d",
+                (int) (Math.random() * 10000),
+                (int) (Math.random() * 10000),
+                (int) (Math.random() * 10000),
+                (int) (Math.random() * 10000));
+
+        String pinGen = String.format("%04d",
+                (int) (Math.random() * 10000));
+
+        Conn conn = new Conn();
+        String personalInfoQuery = "INSERT INTO personal_info " +
+                "(form_number, first_name, last_name, email, nationality, region, city, gender, marital_status) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try {
+            PreparedStatement pstmtPersonalInfo = conn.con.prepareStatement(personalInfoQuery);
+            pstmtPersonalInfo.setString(1, formNumber);
+            pstmtPersonalInfo.setString(2, firstName);
+            pstmtPersonalInfo.setString(3, lastName);
+            pstmtPersonalInfo.setString(4, email);
+            pstmtPersonalInfo.setString(5, nationality);
+            pstmtPersonalInfo.setString(6, region);
+            pstmtPersonalInfo.setString(7, city);
+            pstmtPersonalInfo.setString(8, gender);
+            pstmtPersonalInfo.setString(9, maritalStatus);
+            pstmtPersonalInfo.executeUpdate();
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+
+        }
+
 
     }
 }
