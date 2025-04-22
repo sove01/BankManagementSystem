@@ -4,6 +4,6 @@ public class Main {
     public static void main(String[] args){
 new Login();
 new Conn();
-new SignUp();
+new SignUp2();
     }
 }

@@ -7,9 +7,9 @@ import java.sql.SQLException;
 import java.util.Random;
 
 public class SignUp extends JFrame implements ActionListener {
-    JRadioButton marriedButton, unmarriedButton, otherButton, maleButton, femaleButton, otherGenderButton;
+//    JRadioButton marriedButton, unmarriedButton, otherButton, maleButton, femaleButton, otherGenderButton;
     JButton nextSignUp;
-    JTextField lastNameText, firstNameText, emailText, genderText, nationalityText, regionText, cityText, pinText;
+   JTextField lastNameText, firstNameText, nationalityText, regionText, cityText, pinText;
 
     //Generate random 2 digit number - represents application number
     String aN = String.format(" %02d", new Random().nextInt(100) + 1);
@@ -68,17 +68,17 @@ public class SignUp extends JFrame implements ActionListener {
         lastNameText.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         add(lastNameText);
 
-        //Email label
-        JLabel email = new JLabel("Email");
-        email.setBounds(100, 290, 100, 30);
-        email.setFont(new Font("Times New Roman", Font.PLAIN, 15));
-        add(email);
-
-        //Email field
-        emailText = new JTextField();
-        emailText.setBounds(200, 290, 100, 30);
-        emailText.setFont(new Font("Times New Roman", Font.PLAIN, 15));
-        add(emailText);
+//        //Email label
+//        JLabel email = new JLabel("Email");
+//        email.setBounds(100, 290, 100, 30);
+//        email.setFont(new Font("Times New Roman", Font.PLAIN, 15));
+//        add(email);
+//
+//        //Email field
+//        emailText = new JTextField();
+//        emailText.setBounds(200, 290, 100, 30);
+//        emailText.setFont(new Font("Times New Roman", Font.PLAIN, 15));
+//        add(emailText);
 
         //Gender label
         JLabel gender = new JLabel("Gender");
@@ -86,19 +86,19 @@ public class SignUp extends JFrame implements ActionListener {
         gender.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         add(gender);
 
-        //Gender Options
-        maleButton = new JRadioButton("Male");
-        setBounds(200, 340, 100, 30);
-        maleButton.setFont(new Font("Times New Roman", Font.BOLD, 15));
-        add(maleButton);
-        femaleButton = new JRadioButton("Female");
-        femaleButton.setBounds(300, 340, 100, 30);
-        femaleButton.setFont(new Font("Times New Roman", Font.BOLD, 15));
-        add(femaleButton);
-        otherGenderButton = new JRadioButton("Other gender ( gay as hell )");
-        otherGenderButton.setBounds(400, 340, 100, 30);
-        otherGenderButton.setFont(new Font("Times New Roman", Font.BOLD, 15));
-        add(otherGenderButton);
+//        //Gender Options
+//        maleButton = new JRadioButton("Male");
+//        setBounds(250, 340, 100, 30);
+//        maleButton.setFont(new Font("Times New Roman", Font.BOLD, 15));
+//        add(maleButton);
+//        femaleButton = new JRadioButton("Female");
+//        femaleButton.setBounds(400, 340, 100, 30);
+//        femaleButton.setFont(new Font("Times New Roman", Font.BOLD, 15));
+//        add(femaleButton);
+//        otherGenderButton = new JRadioButton("Other gender ( gay as hell )");
+//        otherGenderButton.setBounds(550, 340, 100, 30);
+//        otherGenderButton.setFont(new Font("Times New Roman", Font.BOLD, 15));
+//        add(otherGenderButton);
 
 
         //Nationality label
@@ -136,38 +136,38 @@ public class SignUp extends JFrame implements ActionListener {
         cityText.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         add(cityText);
 
-        //Marital status label
-        JLabel maritalStatus = new JLabel("Marital Status :");
-        maritalStatus.setFont(new Font("Raleway", Font.BOLD, 15));
-        maritalStatus.setBounds(100, 540, 200, 30);
-        add(maritalStatus);
+//        //Marital status label
+//        JLabel maritalStatus = new JLabel("Marital Status :");
+//        maritalStatus.setFont(new Font("Raleway", Font.BOLD, 15));
+//        maritalStatus.setBounds(100, 540, 200, 30);
+//        add(maritalStatus);
+//
+//        //Married button
+//        marriedButton = new JRadioButton("Married");
+//        marriedButton.setBounds(250, 540, 100, 30);
+//        marriedButton.setBackground(new Color(222, 255, 228));
+//        marriedButton.setFont(new Font("Raleway", Font.BOLD, 15));
+//        add(marriedButton);
+//
+//        //Unmarried button
+//        unmarriedButton = new JRadioButton("Unmarried");
+//        unmarriedButton.setBackground(new Color(222, 255, 228));
+//        unmarriedButton.setBounds(400, 540, 100, 30);
+//        unmarriedButton.setFont(new Font("Raleway", Font.BOLD, 15));
+//        add(unmarriedButton);
+//
+//        //Other button
+//        otherButton = new JRadioButton("Other");
+//        otherButton.setBackground(new Color(222, 255, 228));
+//        otherButton.setBounds(550, 540, 100, 30);
+//        otherButton.setFont(new Font("Raleway", Font.BOLD, 15));
+//        add(otherButton);
 
-        //Married button
-        marriedButton = new JRadioButton("Married");
-        marriedButton.setBounds(250, 540, 100, 30);
-        marriedButton.setBackground(new Color(222, 255, 228));
-        marriedButton.setFont(new Font("Raleway", Font.BOLD, 15));
-        add(marriedButton);
 
-        //Unmarried button
-        unmarriedButton = new JRadioButton("Unmarried");
-        unmarriedButton.setBackground(new Color(222, 255, 228));
-        unmarriedButton.setBounds(400, 540, 100, 30);
-        unmarriedButton.setFont(new Font("Raleway", Font.BOLD, 15));
-        add(unmarriedButton);
-
-        //Other button
-        otherButton = new JRadioButton("Other");
-        otherButton.setBackground(new Color(222, 255, 228));
-        otherButton.setBounds(550, 540, 100, 30);
-        otherButton.setFont(new Font("Raleway", Font.BOLD, 15));
-        add(otherButton);
-
-
-        ButtonGroup buttonGroup1 = new ButtonGroup();
-        buttonGroup1.add(marriedButton);
-        buttonGroup1.add(unmarriedButton);
-        buttonGroup1.add(otherButton);
+//        ButtonGroup buttonGroup1 = new ButtonGroup();
+//        buttonGroup1.add(marriedButton);
+//        buttonGroup1.add(unmarriedButton);
+//        buttonGroup1.add(otherButton);
 
         //PIN label
         JLabel pin = new JLabel("PIN");
@@ -205,36 +205,37 @@ public class SignUp extends JFrame implements ActionListener {
         String formNumber = aN;
         String lastName = lastNameText.getText();
         String firstName = firstNameText.getText();
-        String email = emailText.getText();
+//        String email = emailText.getText();
         String nationality = nationalityText.getText();
         String region = regionText.getText();
         String city = cityText.getText();
-        String gender = null;
-        String maritalStatus = null;
+//        String gender = null;
+//        String maritalStatus = null;
 
-        if (maleButton.isSelected()) {
-            gender = "Male";
-        } else if (femaleButton.isSelected()) {
-            gender = "Female";
-        } else if (otherGenderButton.isSelected()) {
-            gender = "Other";
-        }
-
-        if (marriedButton.isSelected()) {
-            maritalStatus = "Married";
-        } else if (unmarriedButton.isSelected()) {
-            maritalStatus = "Unmarried";
-        } else if (otherButton.isSelected()) {
-            maritalStatus = "Other";
-        }
+//        if (maleButton.isSelected()) {
+//            gender = "Male";
+//        } else if (femaleButton.isSelected()) {
+//            gender = "Female";
+//        } else if (otherGenderButton.isSelected()) {
+//            gender = "Other";
+//        }
+//
+//        if (marriedButton.isSelected()) {
+//            maritalStatus = "Married";
+//        } else if (unmarriedButton.isSelected()) {
+//            maritalStatus = "Unmarried";
+//        } else if (otherButton.isSelected()) {
+//            maritalStatus = "Other";
+//        }
 
         //to validate required fields
-        try {
-            if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || nationality.isEmpty() || region.isEmpty() || city.isEmpty() || gender == null || maritalStatus == null)
-                ;
-            JOptionPane.showMessageDialog(null, "Please fill out everything in the form");
-            return;
-        }
+//        try {
+//            if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || nationality.isEmpty() || region.isEmpty() || city.isEmpty() || gender == null || maritalStatus == null)
+//                ;
+//            JOptionPane.showMessageDialog(null, "Please fill out everything in the form");
+//            return;
+//        }
+
 
         //Random card number and pin generator
         String cNumGen = String.format("%04d-%04d-%04d-%04d",
@@ -256,13 +257,46 @@ public class SignUp extends JFrame implements ActionListener {
             pstmtPersonalInfo.setString(1, formNumber);
             pstmtPersonalInfo.setString(2, firstName);
             pstmtPersonalInfo.setString(3, lastName);
-            pstmtPersonalInfo.setString(4, email);
+//            pstmtPersonalInfo.setString(4, email);
             pstmtPersonalInfo.setString(5, nationality);
             pstmtPersonalInfo.setString(6, region);
             pstmtPersonalInfo.setString(7, city);
-            pstmtPersonalInfo.setString(8, gender);
-            pstmtPersonalInfo.setString(9, maritalStatus);
+//            pstmtPersonalInfo.setString(8, gender);
+//            pstmtPersonalInfo.setString(9, maritalStatus);
             pstmtPersonalInfo.executeUpdate();
+
+            //insert into login table
+            String loginQuery = "INSERT INTO login " +
+                    "(form_number, card_number, pin) " +
+                    "VALUES (?, ?, ?)";
+
+            PreparedStatement pstmtLogin = conn.con.prepareStatement(loginQuery);
+            pstmtLogin.setString(1, formNumber);
+            pstmtLogin.setString(2, cNumGen);
+            pstmtLogin.setString(3, pinGen);
+            pstmtLogin.executeUpdate();
+
+            //insert into account table
+            String accountQuery = "INSERT INTO account " +
+                    "(form_number, card_number, pin, balance) " +
+                    "VALUES (?, ?, ?, ?)";
+
+            PreparedStatement pstmtAccount = conn.con.prepareStatement(accountQuery);
+            pstmtAccount.setString(1, formNumber);
+            pstmtAccount.setString(2, cNumGen);
+            pstmtAccount.setString(3, pinGen);
+            pstmtAccount.setDouble(4, balance);
+            pstmtAccount.executeUpdate();
+
+            JOptionPane.showMessageDialog(null,
+                    "Account created successfully!\n" +
+                            "Your Card Number: " + cNumGen + "\n" +
+                            "Your PIN: " + pinGen + "\n" +
+                            "Please remember these credentials.");
+
+            //close the signup and open login frame
+            setVisible(false);
+            new Login();
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
 
