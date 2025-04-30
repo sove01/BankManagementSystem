@@ -7,7 +7,7 @@ import java.sql.PreparedStatement;
 public class SignUp2 extends JFrame implements ActionListener {
     JRadioButton marriedButton, unmarriedButton, otherButton, maleButton, femaleButton, otherGenderButton;
     JButton nextSignUp;
-    JTextField cardLimitText, homeAddressText, phoneNumberText, emailText;
+    JTextField cardLimitText, homeAddressText, phoneNumberText, emailText ;
 
     SignUp2() {
         super("APPLICATION FORM - SEQUEL");
@@ -28,12 +28,13 @@ public class SignUp2 extends JFrame implements ActionListener {
         //Home address label
         JLabel address = new JLabel("Adress");
         address.setBounds(100, 240, 100, 30);
-        address.setFont(new Font("Times New Roman", Font.PLAIN, 25));
+        address.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         add(address);
+
         //Home address field
         homeAddressText = new JTextField();
         homeAddressText.setBounds(300, 240, 100, 30);
-        homeAddressText.setFont(new Font("Times New Roman", Font.PLAIN, 25));
+        homeAddressText.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         add(homeAddressText);
 
 
@@ -45,7 +46,7 @@ public class SignUp2 extends JFrame implements ActionListener {
 
         //Email field
         emailText = new JTextField();
-        emailText.setBounds(200, 290, 100, 30);
+        emailText.setBounds(300, 290, 100, 30);
         emailText.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         add(emailText);
 
@@ -82,24 +83,31 @@ public class SignUp2 extends JFrame implements ActionListener {
         buttonGroup1.add(unmarriedButton);
         buttonGroup1.add(otherButton);
 
+        //Gender Jlabel
+        JLabel genderLabel = new JLabel("Gender");
+        genderLabel.setFont(new Font("Raleway", Font.BOLD, 15));
+        genderLabel.setBounds(100, 340, 100, 30);
+        add(genderLabel);
+
+
         //Gender Options
         maleButton = new JRadioButton("Male");
-        setBounds(250, 340, 100, 30);
+        maleButton.setBounds(300, 340, 100, 30);
         maleButton.setFont(new Font("Times New Roman", Font.BOLD, 15));
         add(maleButton);
         femaleButton = new JRadioButton("Female");
-        femaleButton.setBounds(400, 340, 100, 30);
+        femaleButton.setBounds(450, 340, 100, 30);
         femaleButton.setFont(new Font("Times New Roman", Font.BOLD, 15));
         add(femaleButton);
         otherGenderButton = new JRadioButton("Other gender");
-        otherGenderButton.setBounds(550, 340, 100, 30);
+        otherGenderButton.setBounds(600, 340, 100, 30);
         otherGenderButton.setFont(new Font("Times New Roman", Font.BOLD, 15));
         add(otherGenderButton);
 
-        ButtonGroup buttonGroup2 = new ButtonGroup();
-        buttonGroup2.add(maleButton);
-        buttonGroup2.add(femaleButton);
-        buttonGroup2.add(otherGenderButton);
+        ButtonGroup genderButtons = new ButtonGroup();
+        genderButtons.add(maleButton);
+        genderButtons.add(femaleButton);
+        genderButtons.add(otherGenderButton);
 
         //Next
         nextSignUp = new JButton("Next");
@@ -120,6 +128,21 @@ public class SignUp2 extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        String cardLimit;
+        String homeAddress;
+        String phoneNumber;
+        String email;
+        String gender = null;
+        String maritalStatus = null;
+
+
+
+//        try{
+//            if(cardLimit.isEmpty() || homeAddress.isEmpty() || phoneNumber.isEmpty() || email.isEmpty() || gender.isEmpty() || maritalStatus.isEmpty() ){
+//                JOptionPane.showMessageDialog(null, "Please fill out everything in the form");
+//            }
+//            return;
+//        }
 //        String gender = null;
 //        String maritalStatus = null;
 //
