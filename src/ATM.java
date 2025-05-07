@@ -19,6 +19,8 @@ public class ATM extends JFrame implements ActionListener {
         //Withdraw button
         withdrawCashButton = new JButton("Withdraw");
         withdrawCashButton.setBounds(255, 350, 50, 50);
+        withdrawCashButton.setFont(new Font("Tahoma", Font.PLAIN, 4));
+
         withdrawCashButton.setForeground(Color.BLACK);
         withdrawCashButton.addActionListener(this);
         add(withdrawCashButton);
@@ -86,6 +88,7 @@ public class ATM extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+
 
     }
 }

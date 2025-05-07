@@ -201,107 +201,107 @@ public class SignUp extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        double balance = 0; // intial balance
-        String formNumber = aN;
-        String lastName = lastNameText.getText();
-        String firstName = firstNameText.getText();
-//        String email = emailText.getText();
-        String nationality = nationalityText.getText();
-        String region = regionText.getText();
-        String city = cityText.getText();
-//        String gender = null;
-//        String maritalStatus = null;
-
-//        if (maleButton.isSelected()) {
-//            gender = "Male";
-//        } else if (femaleButton.isSelected()) {
-//            gender = "Female";
-//        } else if (otherGenderButton.isSelected()) {
-//            gender = "Other";
+//        double balance = 0; // intial balance
+//        String formNumber = aN;
+//        String lastName = lastNameText.getText();
+//        String firstName = firstNameText.getText();
+////        String email = emailText.getText();
+//        String nationality = nationalityText.getText();
+//        String region = regionText.getText();
+//        String city = cityText.getText();
+////        String gender = null;
+////        String maritalStatus = null;
+//
+////        if (maleButton.isSelected()) {
+////            gender = "Male";
+////        } else if (femaleButton.isSelected()) {
+////            gender = "Female";
+////        } else if (otherGenderButton.isSelected()) {
+////            gender = "Other";
+////        }
+////
+////        if (marriedButton.isSelected()) {
+////            maritalStatus = "Married";
+////        } else if (unmarriedButton.isSelected()) {
+////            maritalStatus = "Unmarried";
+////        } else if (otherButton.isSelected()) {
+////            maritalStatus = "Other";
+////        }
+//
+//        //to validate required fields
+////        try {
+////            if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || nationality.isEmpty() || region.isEmpty() || city.isEmpty() || gender == null || maritalStatus == null)
+////                ;
+////            JOptionPane.showMessageDialog(null, "Please fill out everything in the form");
+////            return;
+////        }
+//
+//
+//        //Random card number and pin generator
+//        String cNumGen = String.format("%04d-%04d-%04d-%04d",
+//                (int) (Math.random() * 10000),
+//                (int) (Math.random() * 10000),
+//                (int) (Math.random() * 10000),
+//                (int) (Math.random() * 10000));
+//
+//        String pinGen = String.format("%04d",
+//                (int) (Math.random() * 10000));
+//
+//        databaseConnection databaseConnection = new databaseConnection();
+//        String personalInfoQuery = "INSERT INTO personal_info " +
+//                "(form_number, first_name, last_name, email, nationality, region, city, gender, marital_status) " +
+//                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+//
+//        try {
+//            PreparedStatement pstmtPersonalInfo = databaseConnection.con.prepareStatement(personalInfoQuery);
+//            pstmtPersonalInfo.setString(1, formNumber);
+//            pstmtPersonalInfo.setString(2, firstName);
+//            pstmtPersonalInfo.setString(3, lastName);
+////            pstmtPersonalInfo.setString(4, email);
+//            pstmtPersonalInfo.setString(5, nationality);
+//            pstmtPersonalInfo.setString(6, region);
+//            pstmtPersonalInfo.setString(7, city);
+////            pstmtPersonalInfo.setString(8, gender);
+////            pstmtPersonalInfo.setString(9, maritalStatus);
+//            pstmtPersonalInfo.executeUpdate();
+//
+//            //insert into login table
+//            String loginQuery = "INSERT INTO login " +
+//                    "(form_number, card_number, pin) " +
+//                    "VALUES (?, ?, ?)";
+//
+//            PreparedStatement pstmtLogin = databaseConnection.con.prepareStatement(loginQuery);
+//            pstmtLogin.setString(1, formNumber);
+//            pstmtLogin.setString(2, cNumGen);
+//            pstmtLogin.setString(3, pinGen);
+//            pstmtLogin.executeUpdate();
+//
+//            //insert into account table
+//            String accountQuery = "INSERT INTO account " +
+//                    "(form_number, card_number, pin, balance) " +
+//                    "VALUES (?, ?, ?, ?)";
+//
+//            PreparedStatement pstmtAccount = databaseConnection.con.prepareStatement(accountQuery);
+//            pstmtAccount.setString(1, formNumber);
+//            pstmtAccount.setString(2, cNumGen);
+//            pstmtAccount.setString(3, pinGen);
+//            pstmtAccount.setDouble(4, balance);
+//            pstmtAccount.executeUpdate();
+//
+//            JOptionPane.showMessageDialog(null,
+//                    "Account created successfully!\n" +
+//                            "Your Card Number: " + cNumGen + "\n" +
+//                            "Your PIN: " + pinGen + "\n" +
+//                            "Please remember these credentials.");
+//
+//            //close the signup and open login frame
+//            setVisible(false);
+//            new Login();
+//        } catch (SQLException ex) {
+//            throw new RuntimeException(ex);
+//
 //        }
 //
-//        if (marriedButton.isSelected()) {
-//            maritalStatus = "Married";
-//        } else if (unmarriedButton.isSelected()) {
-//            maritalStatus = "Unmarried";
-//        } else if (otherButton.isSelected()) {
-//            maritalStatus = "Other";
-//        }
-
-        //to validate required fields
-//        try {
-//            if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || nationality.isEmpty() || region.isEmpty() || city.isEmpty() || gender == null || maritalStatus == null)
-//                ;
-//            JOptionPane.showMessageDialog(null, "Please fill out everything in the form");
-//            return;
-//        }
-
-
-        //Random card number and pin generator
-        String cNumGen = String.format("%04d-%04d-%04d-%04d",
-                (int) (Math.random() * 10000),
-                (int) (Math.random() * 10000),
-                (int) (Math.random() * 10000),
-                (int) (Math.random() * 10000));
-
-        String pinGen = String.format("%04d",
-                (int) (Math.random() * 10000));
-
-        Conn conn = new Conn();
-        String personalInfoQuery = "INSERT INTO personal_info " +
-                "(form_number, first_name, last_name, email, nationality, region, city, gender, marital_status) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        try {
-            PreparedStatement pstmtPersonalInfo = conn.con.prepareStatement(personalInfoQuery);
-            pstmtPersonalInfo.setString(1, formNumber);
-            pstmtPersonalInfo.setString(2, firstName);
-            pstmtPersonalInfo.setString(3, lastName);
-//            pstmtPersonalInfo.setString(4, email);
-            pstmtPersonalInfo.setString(5, nationality);
-            pstmtPersonalInfo.setString(6, region);
-            pstmtPersonalInfo.setString(7, city);
-//            pstmtPersonalInfo.setString(8, gender);
-//            pstmtPersonalInfo.setString(9, maritalStatus);
-            pstmtPersonalInfo.executeUpdate();
-
-            //insert into login table
-            String loginQuery = "INSERT INTO login " +
-                    "(form_number, card_number, pin) " +
-                    "VALUES (?, ?, ?)";
-
-            PreparedStatement pstmtLogin = conn.con.prepareStatement(loginQuery);
-            pstmtLogin.setString(1, formNumber);
-            pstmtLogin.setString(2, cNumGen);
-            pstmtLogin.setString(3, pinGen);
-            pstmtLogin.executeUpdate();
-
-            //insert into account table
-            String accountQuery = "INSERT INTO account " +
-                    "(form_number, card_number, pin, balance) " +
-                    "VALUES (?, ?, ?, ?)";
-
-            PreparedStatement pstmtAccount = conn.con.prepareStatement(accountQuery);
-            pstmtAccount.setString(1, formNumber);
-            pstmtAccount.setString(2, cNumGen);
-            pstmtAccount.setString(3, pinGen);
-            pstmtAccount.setDouble(4, balance);
-            pstmtAccount.executeUpdate();
-
-            JOptionPane.showMessageDialog(null,
-                    "Account created successfully!\n" +
-                            "Your Card Number: " + cNumGen + "\n" +
-                            "Your PIN: " + pinGen + "\n" +
-                            "Please remember these credentials.");
-
-            //close the signup and open login frame
-            setVisible(false);
-            new Login();
-        } catch (SQLException ex) {
-            throw new RuntimeException(ex);
-
-        }
-
 
     }
 }

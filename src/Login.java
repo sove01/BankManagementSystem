@@ -2,15 +2,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 public class Login extends JFrame implements ActionListener {
     JLabel welcomeLabel, cardNumberLabel, pinLabel;
     JTextField cardNumber;
     JPasswordField PIN;
     JButton button1, button2, button3;
+
 
     Login() {
         //Bank icon
@@ -111,42 +109,20 @@ public class Login extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        try {
-            if (e.getSource() == button1) {
-                Conn conn = new Conn();
-                String cardNum = cardNumber.getText();
-                String pin = PIN.getText();
+        String cardNum = cardNumber.getText();
+        String pin = PIN.getText().trim();
 
-                //SQlite prepared statement to prevent sql injection
-                String query = "SELECT * FROM login WHERE card_number = ? AND pin = ?";
+        userDAO userDAO = new userDAO();
+        if (userDAO.validateLogin(cardNum, pin)) {
+            setVisible(false);
+//            new ATM(pin);
+        } else {
+            JOptionPane.showMessageDialog(this, "Incorrect Card Number or PIN");
 
-                //Prepare the statement and execute
-                PreparedStatement pstmt = conn.con.prepareStatement(query);
-                pstmt.setString(1, cardNum);
-                pstmt.setString(2, pin);
-
-//                ResultSet rs = pstmt.executeQuery();
-//                if (rs.next()) {
-//                    setVisible(false);
-//                    new ATM(pin);
-//                } else {
-//                    JOptionPane.showMessageDialog(null, "Incorrect Card Number or PIN");
-//                }
-
-            } else if (e.getSource() == button2) {
-                cardNumber.setText("");
-                PIN.setText("");
-            } else if (e.getSource() == button3) {
-                new SignUp();
-                setVisible(false);
-
-            }
-        } catch (SQLException ex) {
-            throw new RuntimeException(ex);
-//            ex.printStackTrace();
         }
-
     }
 
 
 }
+
+
