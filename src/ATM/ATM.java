@@ -1,14 +1,17 @@
+package ATM;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class ATM extends JFrame implements ActionListener {
-    JButton withdrawCashButton, depositCashButton, fundTransferButton, checkBalanceButton,bankStatementsButton, PINChangeButton, moreOptionsButton, returnButton;
+    JButton withdrawCashButton, depositCashButton, fastCashButton, checkBalanceButton, bankStatementsButton, PINChangeButton, moreOptionsButton, returnButton;
+    String pin;
 
-    public ATM() {
+    public ATM(String pin) {
+        this.pin = pin;
         //Bank icon
-        super("ATM");
         ImageIcon ATMIcon = new ImageIcon("src/Images/atm2.png");
         Image image = ATMIcon.getImage().getScaledInstance(1920, 1080, Image.SCALE_DEFAULT);
         ImageIcon icon = new ImageIcon(image);
@@ -35,11 +38,11 @@ public class ATM extends JFrame implements ActionListener {
         depositCashButton.setContentAreaFilled(true);
 
         //Transfer button
-        fundTransferButton = new JButton("Fund Transfer");
-        fundTransferButton.setBounds(255, 470, 50, 50);
-        fundTransferButton.setForeground(Color.BLACK);
-        fundTransferButton.addActionListener(this);
-        add(fundTransferButton);
+        fastCashButton = new JButton("Fast cash ");
+        fastCashButton.setBounds(255, 470, 50, 50);
+        fastCashButton.setForeground(Color.BLACK);
+        fastCashButton.addActionListener(this);
+        add(fastCashButton);
 
         //Check Balance button
         checkBalanceButton = new JButton("Check Balance");
@@ -77,9 +80,8 @@ public class ATM extends JFrame implements ActionListener {
         add(returnButton);
 
 
-
         setLayout(null);
-        setSize(1920, 1080);
+        setSize(1550, 1080);
         setLocation(0, 0);
         setVisible(true);
 
@@ -88,7 +90,25 @@ public class ATM extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == withdrawCashButton) {
+            new Withdrawl(pin);
+            setVisible(false);
+        } else if (e.getSource() == depositCashButton) {
+            new Deposit(pin);
+            setVisible(false);
+        } else if (e.getSource() == checkBalanceButton) {
+            new Balance(pin);
+            setVisible(false);
+        } else if (e.getSource() == fastCashButton) {
+            new fastCash(pin);
+            setVisible(false);
+        } else if (e.getSource() == bankStatementsButton) {
 
+        } else if (e.getSource() == moreOptionsButton) {
+
+        } else if (e.getSource() == returnButton) {
+            System.exit(0);
+        }
 
     }
 }

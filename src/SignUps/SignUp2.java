@@ -1,15 +1,25 @@
+package SignUps;
+
+import databaseCON.User;
+import databaseCON.UserDAO;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.PreparedStatement;
 
 public class SignUp2 extends JFrame implements ActionListener {
     JRadioButton marriedButton, unmarriedButton, otherButton, maleButton, femaleButton, otherGenderButton;
     JButton nextSignUp;
-    JTextField cardLimitText, homeAddressText, phoneNumberText, emailText ;
+    JTextField cardLimitText, homeAddressText, phoneNumberText, emailText;
+    private String firstName;
+    private String lastName;
+    private String nationality;
+    private String region;
+    private String city;
+    private String pin;
 
-    SignUp2() {
+    SignUp2(String firstName, String lastName, String nationality, String region, String city, String pin) {
         super("APPLICATION FORM - SEQUEL");
         ImageIcon bankIcon = new ImageIcon("src/Images/bank.png");
         Image image = bankIcon.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
@@ -128,45 +138,75 @@ public class SignUp2 extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        String cardLimit;
-        String homeAddress;
-        String phoneNumber;
-        String email;
-        String gender = null;
-        String maritalStatus = null;
+        if (e.getSource() == nextSignUp) {
+            String homeAddress = homeAddressText.getText();
+            String phoneNumber = phoneNumberText.getText();
+            String email = emailText.getText();
+
+            String currentSelectedGender = "";
+            if (maleButton.isSelected()) {
+                currentSelectedGender = maleButton.getText();
+            } else if (femaleButton.isSelected()) {
+                currentSelectedGender = femaleButton.getText();
+            } else if (otherGenderButton.isSelected()) {
+                currentSelectedGender = otherGenderButton.getText();
+            } else {
+                JOptionPane.showMessageDialog(this, "Please select a gender.");
+                return;
+            }
+
+            String currentMaritalStatus = "";
+            if (marriedButton.isSelected()) {
+                currentMaritalStatus = marriedButton.getText();
+            } else if (unmarriedButton.isSelected()) {
+                currentMaritalStatus = unmarriedButton.getText();
+            } else if (otherButton.isSelected()) { // Corrected from otherGenderButton
+                currentMaritalStatus = otherButton.getText();
+            } else {
+                JOptionPane.showMessageDialog(this, "Please select marital status.");
+                return;
+            }
+
+            // Basic validation for this form
+            if (homeAddress.isEmpty() || phoneNumber.isEmpty() || email.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please fill in all required fields on this page.");
+                return;
+            }
+
+            UserDAO dao = new UserDAO();
+
+            // validations
+            if (!dao.validateEmail(email)) {
+                JOptionPane.showMessageDialog(this, "Invalid email format.");
+                return;
+            }
+            if (dao.isEmailRegistered(email)) {
+                JOptionPane.showMessageDialog(this, "Email already in use.");
+                return;
+            }
+            if (!dao.validatePhone(phoneNumber)) {
+                JOptionPane.showMessageDialog(this, "Invalid phone number.");
+                return;
+            }
+            if (dao.isPhoneNumberRegistered(phoneNumber)) { // Make sure userDAO has this method
+                JOptionPane.showMessageDialog(this, "Phone number already in use.");
+                return;
+            }
 
 
+            User newUser = new User(
+                    firstName, lastName, nationality, region, city,
+                    phoneNumber, email, currentSelectedGender, currentMaritalStatus, pin, homeAddress
+            );
 
-//        try{
-//            if(cardLimit.isEmpty() || homeAddress.isEmpty() || phoneNumber.isEmpty() || email.isEmpty() || gender.isEmpty() || maritalStatus.isEmpty() ){
-//                JOptionPane.showMessageDialog(null, "Please fill out everything in the form");
-//            }
-//            return;
-//        }
-//        String gender = null;
-//        String maritalStatus = null;
-//
-//        if (maleButton.isSelected()) {
-//            gender = "Male";
-//        } else if (femaleButton.isSelected()) {
-//            gender = "Female";
-//        } else if (otherGenderButton.isSelected()) {
-//            gender = "Other";
-//        }
-//
-//        if (marriedButton.isSelected()) {
-//            maritalStatus = "Married";
-//        } else if (unmarriedButton.isSelected()) {
-//            maritalStatus = "Unmarried";
-//        } else if (otherButton.isSelected()) {
-//            maritalStatus = "Other";
-//        }
-//
-//        Conn conn = new Conn();
-//
-//        try {
-//            PreparedStatement pstmtPersonalInfo2
-//        }
+            if (dao.insertNewUserFromSignUp(newUser)) {
+                JOptionPane.showMessageDialog(this, "User registered successfully!");
+                this.dispose(); // Close this window
+            } else {
+                JOptionPane.showMessageDialog(this, "User registration failed. Please try again.");
 
+
+            }
+        }
     }
 }

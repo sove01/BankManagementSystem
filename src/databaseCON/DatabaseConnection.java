@@ -1,11 +1,13 @@
+package databaseCON;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.DriverManager;
 
-public class databaseConnection {
+public class DatabaseConnection {
     private static Connection con;
 
-    public databaseConnection() {
+    public DatabaseConnection() {
 
     }
 
@@ -23,8 +25,10 @@ public class databaseConnection {
         if (con != null) {
             try {
                 con.close();
+                con = null;
                 System.out.println("Connection closed successfully");
             } catch (SQLException e) {
+                System.out.println("Connection could not be closed" );
                 throw new RuntimeException(e);
             }
         }

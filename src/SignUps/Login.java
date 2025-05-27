@@ -1,3 +1,7 @@
+package SignUps;
+import databaseCON.UserDAO;
+import ATM.ATM;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -109,20 +113,44 @@ public class Login extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        String cardNum = cardNumber.getText();
-        String pin = PIN.getText().trim();
+        if (e.getSource() == button1) {
 
-        userDAO userDAO = new userDAO();
-        if (userDAO.validateLogin(cardNum, pin)) {
+
+            String cardNum = cardNumber.getText();
+            char[] pinChars = PIN.getPassword();
+            String pin = new String(pinChars).trim(); // Convert char array to String and trim
+
+            if (cardNum.isEmpty() || pin.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please enter both Card Number and PIN.");
+                return;
+            }
+
+            UserDAO dao = new UserDAO();
+
+            if (dao.validateLogin(cardNum, pin)) {
+                JOptionPane.showMessageDialog(this, "Login Successful!");
+                setVisible(false);
+                new ATM(pin);
+            } else {
+                JOptionPane.showMessageDialog(this, "Incorrect Card Number or PIN.");
+            }
+
+            //clear pin
+            PIN.setText("");
+
+        } else if (e.getSource() == button2)
+
+        {
+            cardNumber.setText(""); // Clear the card number field
+            PIN.setText("");       // Clear the PIN field
+        } else if (e.getSource() == button3) {
             setVisible(false);
-//            new ATM(pin);
-        } else {
-            JOptionPane.showMessageDialog(this, "Incorrect Card Number or PIN");
-
+            new SignUp();
         }
     }
-
-
 }
+
+
+
 
 
