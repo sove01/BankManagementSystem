@@ -119,6 +119,19 @@ public class SignUp2 extends JFrame implements ActionListener {
         genderButtons.add(femaleButton);
         genderButtons.add(otherGenderButton);
 
+        //phone number
+        JLabel phoneNumber = new JLabel("Phone Number");
+        phoneNumber.setFont(new Font("Raleway", Font.BOLD, 15));
+        phoneNumber.setBounds(100, 390, 100, 30);
+        add(phoneNumber);
+
+        phoneNumberText = new JTextField();
+        phoneNumberText.setBounds(300, 390, 100,30);
+        phoneNumberText.setFont(new Font("Times New Roman", Font.BOLD, 15));
+        add(phoneNumberText);
+
+
+
         //Next
         nextSignUp = new JButton("Next");
         nextSignUp.setBounds(750, 720, 80, 30);
@@ -167,31 +180,31 @@ public class SignUp2 extends JFrame implements ActionListener {
                 return;
             }
 
-            // Basic validation for this form
-            if (homeAddress.isEmpty() || phoneNumber.isEmpty() || email.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please fill in all required fields on this page.");
-                return;
-            }
+//            // Basic validation for this form
+//            if (homeAddress.isEmpty() || phoneNumber.isEmpty() || email.isEmpty()) {
+//                JOptionPane.showMessageDialog(this, "Please fill in all required fields on this page.");
+//                return;
+//            }
 
             UserDAO dao = new UserDAO();
 
-            // validations
-            if (!dao.validateEmail(email)) {
-                JOptionPane.showMessageDialog(this, "Invalid email format.");
-                return;
-            }
-            if (dao.isEmailRegistered(email)) {
-                JOptionPane.showMessageDialog(this, "Email already in use.");
-                return;
-            }
-            if (!dao.validatePhone(phoneNumber)) {
-                JOptionPane.showMessageDialog(this, "Invalid phone number.");
-                return;
-            }
-            if (dao.isPhoneNumberRegistered(phoneNumber)) { // Make sure userDAO has this method
-                JOptionPane.showMessageDialog(this, "Phone number already in use.");
-                return;
-            }
+//            // validations
+//            if (!dao.validateEmail(email)) {
+//                JOptionPane.showMessageDialog(this, "Invalid email format.");
+//                return;
+//            }
+//            if (dao.isEmailRegistered(email)) {
+//                JOptionPane.showMessageDialog(this, "Email already in use.");
+//                return;
+//            }
+//            if (!dao.validatePhone(phoneNumber)) {
+//                JOptionPane.showMessageDialog(this, "Invalid phone number.");
+//                return;
+//            }
+//            if (dao.isPhoneNumberRegistered(phoneNumber)) { // Make sure userDAO has this method
+//                JOptionPane.showMessageDialog(this, "Phone number already in use.");
+//                return;
+//            }
 
 
             User newUser = new User(
@@ -202,6 +215,7 @@ public class SignUp2 extends JFrame implements ActionListener {
             if (dao.insertNewUserFromSignUp(newUser)) {
                 JOptionPane.showMessageDialog(this, "User registered successfully!");
                 this.dispose(); // Close this window
+                new Login();
             } else {
                 JOptionPane.showMessageDialog(this, "User registration failed. Please try again.");
 

@@ -29,7 +29,6 @@ public class User {
         this.homeAddress = homeAddress;
     }
 
-    // Getters for all properties
     public String getFirstName() { return firstName; }
     public String getLastName() { return lastName; }
     public String getNationality() { return nationality; }
@@ -42,6 +41,4 @@ public class User {
     public String getPin() { return pin; }
     public String getHomeAddress() { return homeAddress; }
 
-    // You might want to add setters if you need to modify parts of the user later,
-    // but for signup, the constructor is often sufficient.
 }

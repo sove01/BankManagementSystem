@@ -38,18 +38,16 @@ public class UserDAO {
             pstmt.setString(7, user.getEmail());
             pstmt.setString(8, user.getGender());
             pstmt.setString(9, user.getMaritalStatus());
-            // IMPORTANT: In a real application, you would HASH THE PIN here
-            // For example: pstmt.setString(10, PasswordHasher.hash(user.getPin()));
-            pstmt.setString(10, user.getPin()); // Storing plain text PIN for now (SECURITY RISK!)
+            pstmt.setString(10, user.getPin()); // security risk
             pstmt.setString(11, user.getHomeAddress());
 
-            int rowsAffected = pstmt.executeUpdate(); // Execute the insert statement
-            return rowsAffected > 0; // Return true if at least one row was inserted
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0;
 
         } catch (SQLException e) {
             System.err.println("SQL Error during user signup: " + e.getMessage());
-            e.printStackTrace(); // Print stack trace for debugging
-            return false; // Return false if an SQL exception occurs
+            e.printStackTrace();
+            return false;
         }
     }
 
@@ -63,14 +61,14 @@ public class UserDAO {
      * @return true if the credentials are valid, false otherwise.
      */
     public boolean validateLogin(String cardNum, String PIN) {
-        // Query to check for matching card number and PIN
+        //check for card and pin num
         String query = "SELECT * FROM login WHERE card_number = ? AND pin = ?";
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement pstmt = con.prepareStatement(query)) {
             pstmt.setString(1, cardNum);
             pstmt.setString(2, PIN);
             try (ResultSet rs = pstmt.executeQuery()) {
-                return rs.next(); // Returns true if a matching row is found
+                return rs.next();
             }
         } catch (SQLException e) {
             System.err.println("SQL Error during login validation: " + e.getMessage());
@@ -86,13 +84,12 @@ public class UserDAO {
      * @return true if the email is already registered, false otherwise.
      */
     public boolean isEmailRegistered(String email) {
-        // Query to check for the existence of an email
         String query = "SELECT 1 FROM users WHERE email = ?";
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement pstmt = con.prepareStatement(query)) {
             pstmt.setString(1, email);
             ResultSet rs = pstmt.executeQuery();
-            return rs.next(); // Returns true if a row is found (email exists)
+            return rs.next();
         } catch (SQLException e) {
             System.err.println("SQL Error during email check: " + e.getMessage());
             e.printStackTrace();
@@ -107,13 +104,13 @@ public class UserDAO {
      * @return true if the phone number is already registered, false otherwise.
      */
     public boolean isPhoneNumberRegistered(String phoneNumber) {
-        // Query to check for the existence of a phone number
+        // Query to check phone number
         String query = "SELECT 1 FROM users WHERE phoneNumber = ?";
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement pstmt = con.prepareStatement(query)) {
             pstmt.setString(1, phoneNumber);
             ResultSet rs = pstmt.executeQuery();
-            return rs.next(); // Returns true if a row is found (phone number exists)
+            return rs.next();
         } catch (SQLException e) {
             System.err.println("SQL Error during phone number check: " + e.getMessage());
             e.printStackTrace();
@@ -128,7 +125,7 @@ public class UserDAO {
      * @return true if the phone number matches the expected format, false otherwise.
      */
     public boolean validatePhone(String phone) {
-        // Matches phone numbers starting with +420 (optional) followed by 7 to 15 digits.
+        // phone regex
         return phone.matches("^\\+420?[0-9]{7,15}$");
     }
 
@@ -139,7 +136,7 @@ public class UserDAO {
      * @return true if the email matches a basic email format, false otherwise.
      */
     public boolean validateEmail(String email) {
-        // Basic regex for email validation. Consider more comprehensive patterns for production.
+        // email regex
         return email.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$");
     }
 }

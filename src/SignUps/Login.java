@@ -14,7 +14,7 @@ public class Login extends JFrame implements ActionListener {
     JButton button1, button2, button3;
 
 
-    Login() {
+    public Login() {
         //Bank icon
         super("Login System");
         ImageIcon bankIcon = new ImageIcon("src/Images/bank.png");
