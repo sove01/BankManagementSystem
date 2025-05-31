@@ -1,0 +1,35 @@
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    firstName TEXT NOT NULL,
+    lastName TEXT NOT NULL,
+    nationality TEXT,
+    region TEXT,
+    city TEXT,
+    phoneNumber TEXT,
+    email TEXT,
+    gender TEXT,
+    maritalStatus TEXT,
+    pin TEXT NOT NULL UNIQUE,
+    homeAddress TEXT,
+    cardNumber TEXT NOT NULL UNIQUE,
+    balance REAL DEFAULT 0.00
+);
+
+CREATE INDEX IF NOT EXISTS idx_users_email ON users (email);
+CREATE INDEX IF NOT EXISTS idx_users_phoneNumber ON users (phoneNumber);
+CREATE INDEX IF NOT EXISTS idx_users_pin ON users (pin);
+CREATE INDEX IF NOT EXISTS idx_users_cardNumber ON users (cardNumber);
+
+
+CREATE TABLE bank (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    pin TEXT,
+    date TEXT,
+    type TEXT,
+    amount REAL
+);
+
+CREATE INDEX IF NOT EXISTS idx_bank_pin ON bank (pin);
+
+DELETE FROM users;
+DELETE FROM bank;
