@@ -1,6 +1,7 @@
 package ATM;
 
 import databaseCON.DatabaseConnection;
+import databaseCON.UserDAO;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,9 +17,11 @@ public class Balance extends JFrame implements ActionListener {
     String pin;
     JLabel label2;
     JButton b1;
+    UserDAO dao;
 
     Balance(String pin) {
         this.pin = pin;
+        dao = new UserDAO();
 
         ImageIcon i1 = new ImageIcon("src/Images/backbg.png");
         Image i2 = i1.getImage().getScaledInstance(1550, 830, Image.SCALE_DEFAULT);
@@ -27,7 +30,7 @@ public class Balance extends JFrame implements ActionListener {
         l3.setBounds(0, 0, 1550, 830);
         add(l3);
 
-        JLabel label1 = new JLabel("Your Current Balance is Rs ");
+        JLabel label1 = new JLabel("Your Current Balance is");
         label1.setForeground(Color.WHITE);
         label1.setFont(new Font("System", Font.BOLD, 16));
         label1.setBounds(430, 180, 700, 35);
@@ -46,43 +49,21 @@ public class Balance extends JFrame implements ActionListener {
         b1.addActionListener(this);
         l3.add(b1);
 
-        int balance = 0;
-        Connection con = null;
-        PreparedStatement pstmt = null;
-        ResultSet resultSet = null;
+        double currentBalance = 0.0;
+        String cardNumber = dao.getCardNumberByPin(pin); // Get card number using the pin
 
-        try {
-            con = DatabaseConnection.getConnection();
-            String query = "SELECT type, amount FROM bank WHERE pin = ?";
-            pstmt = con.prepareStatement(query);
-            pstmt.setString(1, pin); // Set the PIN
-
-            resultSet = pstmt.executeQuery();
-
-            while (resultSet.next()) {
-                if (resultSet.getString("type").equals("Deposit")) {
-                    balance += Integer.parseInt(resultSet.getString("amount"));
-                } else {
-                    balance -= Integer.parseInt(resultSet.getString("amount"));
-                }
-
-
+        if (cardNumber != null) {
+            currentBalance = dao.getBalance(cardNumber); // Get balance using the card number
+            if (currentBalance == -1.0) {
+                JOptionPane.showMessageDialog(this, "Error retrieving balance. Please try again.");
+                currentBalance = 0.0;
             }
-        } catch (SQLException e) {
-            System.out.println("SQL error" + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            try {
-                if (resultSet != null) resultSet.close();
-                if (pstmt != null) pstmt.close();
-                if (con != null) con.close();
-            } catch (SQLException e2) {
-                System.out.println("SQL error" + e2.getMessage());
-                e2.printStackTrace();
-            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Error: Could not find account for this PIN.");
+            currentBalance = 0.0;
         }
-        label2.setText("Current balance: " + balance);
 
+        label2.setText("Rs. " + currentBalance); // Display the balance
         setLayout(null);
         setSize(1550, 1080);
         setLocation(0, 0);

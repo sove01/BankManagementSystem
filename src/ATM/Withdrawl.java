@@ -1,27 +1,23 @@
 package ATM;
 
-import databaseCON.DatabaseConnection;
+import databaseCON.UserDAO;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class Withdrawl extends JFrame implements ActionListener {
 
     String pin;
     TextField textField;
-
     JButton b1, b2;
+    UserDAO dao;
 
     Withdrawl(String pin) {
         this.pin = pin;
+        this.dao = new UserDAO();
+
         ImageIcon i1 = new ImageIcon("src/Images/backbg.png");
         Image i2 = i1.getImage().getScaledInstance(1550, 830, Image.SCALE_DEFAULT);
         ImageIcon i3 = new ImageIcon(i2);
@@ -80,21 +76,21 @@ public class Withdrawl extends JFrame implements ActionListener {
         if (e.getSource() == b1) {
             String amountString = textField.getText();
 
-            // Input validation
             if (amountString.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "Please enter the Amount you want to withdraw.");
                 return;
             }
 
-            int withdrawalAmount;
+            double withdrawalAmount;
             try {
-                withdrawalAmount = Integer.parseInt(amountString);
+                withdrawalAmount = Double.parseDouble(amountString);
                 if (withdrawalAmount <= 0) {
                     JOptionPane.showMessageDialog(null, "Please enter a positive amount to withdraw.");
                     return;
                 }
-                if (withdrawalAmount > 10000) { // Enforce maximum withdrawal limit
-                    JOptionPane.showMessageDialog(null, "Maximum withdrawal limit is Rs. 10,000.");
+
+                if (withdrawalAmount > 100000) {
+                    JOptionPane.showMessageDialog(null, "Maximum withdrawal limit is 100,000 CZK.");
                     return;
                 }
             } catch (NumberFormatException ex) {
@@ -103,55 +99,13 @@ public class Withdrawl extends JFrame implements ActionListener {
                 return;
             }
 
-            try (Connection con = DatabaseConnection.getConnection();
-                 PreparedStatement pstmtSelect = con.prepareStatement("SELECT type, amount FROM bank WHERE pin = ?");
-                 PreparedStatement pstmtInsert = con.prepareStatement("INSERT INTO bank (pin, date, type, amount) VALUES (?, ?, ?, ?)")) {
 
-                //Calculate current balance
-                pstmtSelect.setString(1, pin);
-                ResultSet resultSet = pstmtSelect.executeQuery();
-
-                int currentBalance = 0;
-                while (resultSet.next()) {
-                    if (resultSet.getString("type").equals("Deposit")) {
-                        currentBalance += resultSet.getInt("amount");
-                    } else {
-                        currentBalance -= resultSet.getInt("amount");
-                    }
-                }
-                resultSet.close();
-
-                //Check for enough balance
-                if (currentBalance < withdrawalAmount) {
-                    JOptionPane.showMessageDialog(null, "Insufficient Balance.");
-                    return; // Exit method if balance is insufficient
-                }
-
-                //Record the withdrawal transaction
-                Date date = new Date();
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                String formattedDate = dateFormat.format(date);
-
-                pstmtInsert.setString(1, pin);
-                pstmtInsert.setString(2, formattedDate);
-                pstmtInsert.setString(3, "Withdrawal");
-                pstmtInsert.setInt(4, withdrawalAmount);
-
-                int rowsAffected = pstmtInsert.executeUpdate();
-
-                if (rowsAffected > 0) {
-                    JOptionPane.showMessageDialog(null, "Rs. " + withdrawalAmount + " Debited Successfully.");
-                    setVisible(false);
-
-                    new ATM(pin);
-                } else {
-                    JOptionPane.showMessageDialog(null, "Withdrawal failed. Please try again.");
-                }
-
-            } catch (SQLException E) {
-                System.err.println("SQL Error during Withdrawal transaction: " + E.getMessage());
-                E.printStackTrace();
-                JOptionPane.showMessageDialog(null, "An error occurred during withdrawal. Please try again.");
+            if (dao.performDebitTransaction(pin, withdrawalAmount, "Withdrawal")) {
+                JOptionPane.showMessageDialog(null, withdrawalAmount + " CZK Debited Successfully.");
+                setVisible(false);
+                new ATM(pin);
+            } else {
+                JOptionPane.showMessageDialog(null, "Transaction failed. Please try again or check balance.");
             }
         }
     }

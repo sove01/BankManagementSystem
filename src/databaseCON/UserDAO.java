@@ -1,10 +1,9 @@
 package databaseCON;
 
+import javax.swing.*;
 import javax.xml.crypto.Data;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.text.SimpleDateFormat;
 
 public class UserDAO {
 
@@ -178,6 +177,124 @@ public class UserDAO {
             System.err.println("SQL Error during phone number check: " + e.getMessage());
             e.printStackTrace();
             return false;
+        }
+    }
+
+    /**
+     * Updates the PIN for a specific user identified by their current PIN.
+     * This simplified version assumes the provided 'oldPin' is unique enough to find the user.
+     * @param oldPin The user's current (old) PIN.
+     * @param newPin The new PIN to set.
+     * @return true if the PIN was successfully updated, false otherwise.
+     */
+    public boolean updatePin(String oldPin, String newPin) {
+        // Query to update the PIN for a user identified by their old PIN
+        String query = "UPDATE users SET pin = ? WHERE pin = ?";
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(query)) {
+            pstmt.setString(1, newPin);
+            pstmt.setString(2, oldPin);
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.err.println("SQL Error updating PIN: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Performs a debit transaction (withdrawal or fast cash).
+     * It checks balance, updates the user's balance in the 'users' table,
+     * and records the transaction in the 'bank' table.
+     *
+     * @param pin The user's PIN (used to find the card number and for bank table).
+     * @param amount The amount to debit.
+     * @param transactionType The type of transaction (e.g., "Withdrawal", "Fast Cash").
+     * @return true if the debit is successful, false otherwise (e.g., insufficient balance, DB error).
+     */
+    public boolean performDebitTransaction(String pin, double amount, String transactionType) {
+        String cardNumber = getCardNumberByPin(pin);
+        if (cardNumber == null) {
+            System.err.println("Error: Card number not found for PIN: " + pin);
+            return false;
+        }
+
+        Connection con = null;
+        PreparedStatement pstmtUpdateUsers = null;
+        PreparedStatement pstmtInsertBank = null;
+        try {
+            con = DatabaseConnection.getConnection();
+            con.setAutoCommit(false);
+
+
+            double currentBalance = getBalance(cardNumber);
+            if (currentBalance == -1.0) {
+                con.rollback();
+                return false;
+            }
+
+            if (currentBalance < amount) {
+                JOptionPane.showMessageDialog(null, "Insufficient Balance.");
+                con.rollback(); // Rollback any changes if balance is low
+                return false;
+            }
+
+
+            double newBalance = currentBalance - amount;
+
+            String updateUsersQuery = "UPDATE users SET balance = ? WHERE cardNumber = ?";
+            pstmtUpdateUsers = con.prepareStatement(updateUsersQuery);
+            pstmtUpdateUsers.setDouble(1, newBalance);
+            pstmtUpdateUsers.setString(2, cardNumber);
+            int usersRowsAffected = pstmtUpdateUsers.executeUpdate();
+
+            if (usersRowsAffected == 0) {
+                System.err.println("Failed to update user balance for card: " + cardNumber);
+                con.rollback();
+                return false;
+            }
+
+
+            Date date = new Date();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String formattedDate = dateFormat.format(date);
+
+            String insertBankQuery = "INSERT INTO bank (pin, date, type, amount) VALUES (?, ?, ?, ?)";
+            pstmtInsertBank = con.prepareStatement(insertBankQuery);
+            pstmtInsertBank.setString(1, pin);
+            pstmtInsertBank.setString(2, formattedDate);
+            pstmtInsertBank.setString(3, transactionType); //fastcash and withdrawl
+            pstmtInsertBank.setDouble(4, amount);
+            int bankRowsAffected = pstmtInsertBank.executeUpdate();
+
+            if (bankRowsAffected == 0) {
+                System.err.println("Failed to record transaction in bank table for card: " + cardNumber);
+                con.rollback();
+                return false;
+            }
+
+            con.commit();
+            return true;
+
+        } catch (SQLException e) {
+            System.err.println("SQL Error during debit transaction: " + e.getMessage());
+            e.printStackTrace();
+            try {
+                if (con != null) con.rollback(); // rollback balance if error happens
+            } catch (SQLException ex) {
+                System.err.println("Error rolling back transaction: " + ex.getMessage());
+            }
+            return false;
+        } finally {
+            try {
+                if (pstmtUpdateUsers != null) pstmtUpdateUsers.close();
+                if (pstmtInsertBank != null) pstmtInsertBank.close();
+                if (con != null) con.setAutoCommit(true);
+                if (con != null) con.close();
+            } catch (SQLException e) {
+                System.err.println("Error closing resources: " + e.getMessage());
+            }
         }
     }
 

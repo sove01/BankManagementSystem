@@ -1,25 +1,20 @@
 package ATM;
-
-import databaseCON.DatabaseConnection;
+import databaseCON.UserDAO;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 public class fastCash extends JFrame implements ActionListener {
 
     JButton b1, b2, b3, b4, b5, b6, b7;
     String pin;
+    UserDAO dao;
 
     fastCash(String pin) {
         this.pin = pin;
+        this.dao = new UserDAO();
+
         ImageIcon i1 = new ImageIcon("src/Images/backbg.png");
         Image i2 = i1.getImage().getScaledInstance(1550, 830, Image.SCALE_DEFAULT);
         ImageIcon i3 = new ImageIcon(i2);
@@ -97,63 +92,25 @@ public class fastCash extends JFrame implements ActionListener {
             return;
         }
 
-        String amountString = ((JButton) e.getSource()).getText().substring(4);
-        int withdrawalAmount;
+        String amountString = ((JButton) e.getSource()).getText().split(" ")[0]; // Get "100" from "100 CZK"
+        double withdrawalAmount;
 
         try {
-            withdrawalAmount = Integer.parseInt(amountString);
+            withdrawalAmount = Double.parseDouble(amountString);
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(null, "Error: Invalid amount selected.");
+            JOptionPane.showMessageDialog(null, "Error: Invalid amount selected. Please re-select.");
             ex.printStackTrace();
             return;
         }
 
-        try (Connection con = DatabaseConnection.getConnection();
-             PreparedStatement pstmtSelect = con.prepareStatement("SELECT type, amount FROM bank WHERE pin = ?");
-             PreparedStatement pstmtInsert = con.prepareStatement("INSERT INTO bank (pin, date, type, amount) VALUES (?, ?, ?, ?)")) {
 
-            pstmtSelect.setString(1, pin);
-            ResultSet resultSet = pstmtSelect.executeQuery();
-
-            int currentBalance = 0;
-            while (resultSet.next()) {
-                if (resultSet.getString("type").equals("Deposit")) {
-                    currentBalance += resultSet.getInt("amount");
-                } else {
-                    currentBalance -= resultSet.getInt("amount");
-                }
-            }
-            resultSet.close();
-
-            if (currentBalance < withdrawalAmount) {
-                JOptionPane.showMessageDialog(null, "Insufficient Balance");
-                return;
-            }
-
-            Date date = new Date();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String formattedDate = dateFormat.format(date);
-
-            pstmtInsert.setString(1, pin);
-            pstmtInsert.setString(2, formattedDate);
-            pstmtInsert.setString(3, "Withdrawal");
-            pstmtInsert.setInt(4, withdrawalAmount);
-
-            int rowsAffected = pstmtInsert.executeUpdate();
-
-            if (rowsAffected > 0) {
-                JOptionPane.showMessageDialog(null, "Rs. " + withdrawalAmount + " Debited Successfully");
-            } else {
-                JOptionPane.showMessageDialog(null, "Withdrawal failed. Please try again.");
-            }
-
-        } catch (SQLException E) {
-            System.err.println("SQL Error during Fast Cash transaction: " + E.getMessage());
-            E.printStackTrace();
-            JOptionPane.showMessageDialog(null, "An error occurred during transaction. Please try again.");
+        if (dao.performDebitTransaction(pin, withdrawalAmount, "Fast Cash")) {
+            JOptionPane.showMessageDialog(null, withdrawalAmount + " CZK Debited Successfully.");
+            setVisible(false);
+            new ATM(pin);
+        } else {
+            JOptionPane.showMessageDialog(null, "Transaction failed. Please try again or check balance.");
         }
-        setVisible(false);
-        new ATM(pin);
     }
 
 }
