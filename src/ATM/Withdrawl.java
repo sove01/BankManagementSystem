@@ -7,77 +7,103 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * The Withdrawl class provides a graphical user interface for users to withdraw money
+ * from their bank account. It handles input validation and records the transaction.
+ */
 public class Withdrawl extends JFrame implements ActionListener {
 
     String pin;
-    TextField textField;
-    JButton b1, b2;
-    UserDAO dao;
+    JTextField amountField;
+    JButton withdrawButton, backButton;
+    UserDAO userDAO;
+    private ATM atmFrame;
 
-    Withdrawl(String pin) {
+    /**
+     * Constructs a new Withdrawl frame.
+     *
+     * @param pin The PIN of the currently logged-in user, used to identify
+     * the account for the withdrawal transaction.
+     */
+    Withdrawl(String pin, ATM atmFrame) {
         this.pin = pin;
-        this.dao = new UserDAO();
+        this.userDAO = new UserDAO();
+        this.atmFrame = atmFrame;
 
-        ImageIcon i1 = new ImageIcon("src/Images/backbg.png");
-        Image i2 = i1.getImage().getScaledInstance(1550, 830, Image.SCALE_DEFAULT);
-        ImageIcon i3 = new ImageIcon(i2);
-        JLabel l3 = new JLabel(i3);
-        l3.setBounds(0, 0, 1550, 830);
-        add(l3);
-
-        JLabel label1 = new JLabel("MAXIMUM WITHDRAWAL IS 100,000 CZK");
-        label1.setForeground(Color.WHITE);
-        label1.setFont(new Font("System", Font.BOLD, 16));
-        label1.setBounds(460, 180, 700, 35);
-        l3.add(label1);
-
-        JLabel label2 = new JLabel("PLEASE ENTER YOUR AMOUNT");
-        label2.setForeground(Color.WHITE);
-        label2.setFont(new Font("System", Font.BOLD, 16));
-        label2.setBounds(460, 220, 400, 35);
-        l3.add(label2);
-
-
-        textField = new TextField();
-        textField.setBackground(new Color(65, 125, 128));
-        textField.setForeground(Color.WHITE);
-        textField.setBounds(460, 260, 320, 25);
-        textField.setFont(new Font("Raleway", Font.BOLD, 22));
-        l3.add(textField);
-
-        b1 = new JButton("WITHDRAW");
-        b1.setBounds(700, 362, 150, 35);
-        b1.setBackground(new Color(65, 125, 128));
-        b1.setForeground(Color.WHITE);
-        b1.addActionListener(this);
-        l3.add(b1);
-
-        b2 = new JButton("BACK");
-        b2.setBounds(700, 406, 150, 35);
-        b2.setBackground(new Color(65, 125, 128));
-        b2.setForeground(Color.WHITE);
-        b2.addActionListener(this);
-        l3.add(b2);
-
+        setTitle("Withdraw Funds");
+        getContentPane().setBackground(new Color(230, 240, 250));
         setLayout(null);
-        setSize(1550, 1080);
-        setLocation(0, 0);
+        setSize(600, 400);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JLabel titleLabel = new JLabel("Withdraw Funds");
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        titleLabel.setForeground(new Color(30, 60, 90));
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        titleLabel.setBounds(0, 50, getWidth(), 35);
+        add(titleLabel);
+
+        JLabel maxWithdrawalLabel = new JLabel("MAXIMUM WITHDRAWAL IS 100,000 CZK");
+        maxWithdrawalLabel.setForeground(new Color(50, 50, 50));
+        maxWithdrawalLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        maxWithdrawalLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        maxWithdrawalLabel.setBounds(0, 110, getWidth(), 25);
+        add(maxWithdrawalLabel);
+
+        JLabel instructionLabel = new JLabel("PLEASE ENTER YOUR AMOUNT (CZK)");
+        instructionLabel.setForeground(new Color(50, 50, 50));
+        instructionLabel.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+        instructionLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        instructionLabel.setBounds(0, 150, getWidth(), 25);
+        add(instructionLabel);
+
+        amountField = new JTextField();
+        amountField.setFont(new Font("Consolas", Font.BOLD, 20));
+        amountField.setBounds(200, 190, 200, 35);
+        amountField.setBorder(BorderFactory.createLineBorder(new Color(150, 150, 150)));
+        amountField.setHorizontalAlignment(JTextField.RIGHT);
+        add(amountField);
+
+        withdrawButton = new JButton("WITHDRAW");
+        withdrawButton.setBackground(new Color(0, 102, 102));
+        withdrawButton.setForeground(Color.WHITE);
+        withdrawButton.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        withdrawButton.setFocusPainted(false);
+        withdrawButton.setBounds(100, 270, 190, 45);
+        withdrawButton.addActionListener(this);
+        add(withdrawButton);
+
+        backButton = new JButton("BACK TO ATM");
+        backButton.setBackground(new Color(65, 125, 128));
+        backButton.setForeground(Color.WHITE);
+        backButton.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        backButton.setFocusPainted(false);
+        backButton.setBounds(310, 270, 190, 45);
+        backButton.addActionListener(this);
+        add(backButton);
+
         setVisible(true);
     }
 
+    /**
+     * Handles action events generated by the buttons in the Withdrawl frame.
+     * This method processes the withdrawal amount or navigates back to the ATM menu.
+     *
+     * @param e The ActionEvent generated by a button click.
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == b2) {
-            setVisible(false);
-            new ATM(pin);
-            return;
+        if (e.getSource() == backButton) {
+            this.dispose();
+            atmFrame.setVisible(true);
         }
 
-        if (e.getSource() == b1) {
-            String amountString = textField.getText();
+        if (e.getSource() == withdrawButton) {
+            String amountString = amountField.getText();
 
             if (amountString.isEmpty()) {
-                JOptionPane.showMessageDialog(null, "Please enter the Amount you want to withdraw.");
+                JOptionPane.showMessageDialog(this, "Please enter the Amount you want to withdraw.");
                 return;
             }
 
@@ -85,26 +111,38 @@ public class Withdrawl extends JFrame implements ActionListener {
             try {
                 withdrawalAmount = Double.parseDouble(amountString);
                 if (withdrawalAmount <= 0) {
-                    JOptionPane.showMessageDialog(null, "Please enter a positive amount to withdraw.");
+                    JOptionPane.showMessageDialog(this, "Please enter a positive amount to withdraw.");
                     return;
                 }
 
                 if (withdrawalAmount > 100000) {
-                    JOptionPane.showMessageDialog(null, "Maximum withdrawal limit is 100,000 CZK.");
+                    JOptionPane.showMessageDialog(this, "Maximum withdrawal limit is 100,000 CZK.");
                     return;
                 }
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(null, "Invalid amount. Please enter a numerical value.");
+                JOptionPane.showMessageDialog(this, "Invalid amount. Please enter a numerical value.");
                 ex.printStackTrace();
                 return;
             }
 
-            if (dao.performDebitTransaction(pin, withdrawalAmount, "Withdrawal")) {
-                JOptionPane.showMessageDialog(null, withdrawalAmount + " CZK Debited Successfully.");
+            double currentBalance = userDAO.getBalance(pin); // Use pin directly
+            if (currentBalance == -1.0) {
+                JOptionPane.showMessageDialog(this, "Error: Could not retrieve current balance. Please try again.");
+                return;
+            }
+
+            if (withdrawalAmount > currentBalance) {
+                JOptionPane.showMessageDialog(this, "Insufficient balance. Your current balance is " + String.format("%.2f CZK", currentBalance) + ".");
+                return;
+            }
+
+
+            if (userDAO.performDebitTransaction(pin, withdrawalAmount, "Withdrawal")) {
+                JOptionPane.showMessageDialog(this, String.format("%.2f CZK withdrawn Successfully.", withdrawalAmount));
                 setVisible(false);
                 new ATM(pin);
             } else {
-                JOptionPane.showMessageDialog(null, "Transaction failed. Please try again or check balance.");
+                JOptionPane.showMessageDialog(this, "Transaction failed due to an unexpected error. Please try again.");
             }
         }
     }

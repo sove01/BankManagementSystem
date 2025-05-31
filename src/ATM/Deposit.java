@@ -1,7 +1,7 @@
 package ATM;
 
 import databaseCON.DatabaseConnection;
-
+import databaseCON.UserDAO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -20,8 +20,9 @@ public class Deposit extends JFrame implements ActionListener {
 
     private String pin;
     private JTextField amountField;
-
     private JButton depositButton, backButton;
+    private UserDAO userDAO;
+    private ATM atmFrame;
 
     /**
      * Constructs a new Deposit frame.
@@ -29,56 +30,58 @@ public class Deposit extends JFrame implements ActionListener {
      * @param pin The PIN of the currently logged-in user. This PIN is used
      * to identify the user's account for the deposit transaction.
      */
-    public Deposit(String pin) {
+    public Deposit(String pin, ATM atmFrame) {
         this.pin = pin;
+        this.userDAO = new UserDAO();
+        this.atmFrame = atmFrame;
 
         setTitle("Deposit Funds");
-        getContentPane().setBackground(new Color(230, 240, 250)); // Light blue-grey background
+        getContentPane().setBackground(new Color(230, 240, 250));
         setLayout(null);
-        setSize(600, 400); // Adjusted size for a cleaner look
-        setLocationRelativeTo(null); // Center the window
+        setSize(600, 400);
+        setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         // Main title label
         JLabel titleLabel = new JLabel("Deposit Funds");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 28)); // Larger, modern font
-        titleLabel.setForeground(new Color(30, 60, 90)); // Dark blue-grey text
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER); // Center text
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        titleLabel.setForeground(new Color(30, 60, 90));
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleLabel.setBounds(0, 50, getWidth(), 35);
         add(titleLabel);
 
         // Instruction label
         JLabel instructionLabel = new JLabel("ENTER AMOUNT YOU WANT TO DEPOSIT (CZK)");
-        instructionLabel.setFont(new Font("Segoe UI", Font.PLAIN, 18)); // Clearer font
-        instructionLabel.setForeground(new Color(50, 50, 50)); // Darker grey for body text
-        instructionLabel.setBounds(80, 130, 450, 25); // Adjusted position
+        instructionLabel.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+        instructionLabel.setForeground(new Color(50, 50, 50));
+        instructionLabel.setBounds(80, 130, 450, 25);
         add(instructionLabel);
 
         // Amount input field
         amountField = new JTextField();
-        amountField.setFont(new Font("Consolas", Font.BOLD, 20)); // Monospaced for numbers
-        amountField.setBounds(200, 170, 200, 35); // Centered and adjusted
-        amountField.setBorder(BorderFactory.createLineBorder(new Color(150, 150, 150))); // Subtle border
-        amountField.setHorizontalAlignment(JTextField.RIGHT); // Align text to the right
+        amountField.setFont(new Font("Consolas", Font.BOLD, 20));
+        amountField.setBounds(200, 170, 200, 35);
+        amountField.setBorder(BorderFactory.createLineBorder(new Color(150, 150, 150)));
+        amountField.setHorizontalAlignment(JTextField.RIGHT);
         add(amountField);
 
         // Deposit button
         depositButton = new JButton("DEPOSIT");
-        depositButton.setBackground(new Color(0, 102, 102)); // Teal button
+        depositButton.setBackground(new Color(0, 102, 102));
         depositButton.setForeground(Color.WHITE);
-        depositButton.setFont(new Font("Segoe UI", Font.BOLD, 16)); // Clear font
+        depositButton.setFont(new Font("Segoe UI", Font.BOLD, 16));
         depositButton.setFocusPainted(false);
-        depositButton.setBounds(100, 270, 190, 45); // Larger button, left-aligned
+        depositButton.setBounds(100, 270, 190, 45);
         depositButton.addActionListener(this);
         add(depositButton);
 
         // Back button
-        backButton = new JButton("BACK TO ATM"); // More descriptive text
-        backButton.setBackground(new Color(65, 125, 128)); // Slightly different blue-green
+        backButton = new JButton("BACK TO ATM");
+        backButton.setBackground(new Color(65, 125, 128));
         backButton.setForeground(Color.WHITE);
         backButton.setFont(new Font("Segoe UI", Font.BOLD, 16));
         backButton.setFocusPainted(false);
-        backButton.setBounds(310, 270, 190, 45); // Larger button, right-aligned
+        backButton.setBounds(310, 270, 190, 45);
         backButton.addActionListener(this);
         add(backButton);
 
@@ -119,31 +122,78 @@ public class Deposit extends JFrame implements ActionListener {
                 return;
             }
 
-            Date date = new Date();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String formattedDate = dateFormat.format(date);
 
-            try (Connection con = DatabaseConnection.getConnection();
-                 PreparedStatement pstmt = con.prepareStatement("INSERT INTO bank (pin, date, type, amount) VALUES (?, ?, ?, ?)")) {
 
-                pstmt.setString(1, pin);
-                pstmt.setString(2, formattedDate);
-                pstmt.setString(3, "Deposit");
-                pstmt.setDouble(4, depositAmount);
+            // Get current balance
+            double currentBalance = userDAO.getBalance(pin);
+            if (currentBalance == -1.0) {
+                JOptionPane.showMessageDialog(this, "Error: Could not retrieve current balance. Please try again.");
+                return;
+            }
 
-                int rowsAffected = pstmt.executeUpdate();
+            double newBalance = currentBalance + depositAmount;
 
-                if (rowsAffected > 0) {
-                    JOptionPane.showMessageDialog(this, String.format("%.2f CZK Deposited Successfully.", depositAmount));
-                    setVisible(false);
-                    new ATM(pin);
-                } else {
-                    JOptionPane.showMessageDialog(this, "Deposit failed. Please try again.");
+            boolean balanceUpdated = false;
+            Connection con = null;
+
+            try {
+                con = DatabaseConnection.getConnection();
+                con.setAutoCommit(false); // Start transaction
+
+                // Update user's balance in the 'users' table
+                String updateBalanceQuery = "UPDATE users SET balance = ? WHERE pin = ?";
+                try (PreparedStatement pstmtUpdate = con.prepareStatement(updateBalanceQuery)) {
+                    pstmtUpdate.setDouble(1, newBalance);
+                    pstmtUpdate.setString(2, pin);
+                    int rowsAffectedUpdate = pstmtUpdate.executeUpdate();
+                    if (rowsAffectedUpdate > 0) {
+                        balanceUpdated = true;
+                    } else {
+                        con.rollback(); // Rollback if balance update fails
+                        JOptionPane.showMessageDialog(this, "Deposit failed: Could not update balance. Please try again.");
+                        return;
+                    }
                 }
+
+                //  Record transaction in the 'bank' table
+                String insertTransactionQuery = "INSERT INTO bank (pin, date, type, amount) VALUES (?, ?, ?, ?)";
+                try (PreparedStatement pstmtInsert = con.prepareStatement(insertTransactionQuery)) {
+                    Date date = new Date();
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    String formattedDate = dateFormat.format(date);
+
+                    pstmtInsert.setString(1, pin);
+                    pstmtInsert.setString(2, formattedDate);
+                    pstmtInsert.setString(3, "Deposit");
+                    pstmtInsert.setDouble(4, depositAmount);
+                    pstmtInsert.executeUpdate();
+                }
+
+                con.commit();
+                JOptionPane.showMessageDialog(this, String.format("%.2f CZK Deposited Successfully.", depositAmount));
+                this.dispose();
+                atmFrame.setVisible(true);
+
             } catch (SQLException E) {
                 System.err.println("SQL Error during deposit: " + E.getMessage());
                 E.printStackTrace();
+                if (con != null) {
+                    try {
+                        con.rollback();
+                    } catch (SQLException ex) {
+                        System.err.println("Error during rollback: " + ex.getMessage());
+                    }
+                }
                 JOptionPane.showMessageDialog(this, "An error occurred during deposit. Please try again.");
+            } finally {
+                if (con != null) {
+                    try {
+                        con.setAutoCommit(true);
+                        con.close();
+                    } catch (SQLException ex) {
+                        System.err.println("Error closing connection: " + ex.getMessage());
+                    }
+                }
             }
         }
     }

@@ -1,116 +1,170 @@
 package ATM;
+
 import databaseCON.UserDAO;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+/**
+ * The FastCash class provides a graphical user interface for users to perform quick withdrawals
+ * of predefined amounts. It interacts with the UserDAO to debit the account balance.
+ */
 public class fastCash extends JFrame implements ActionListener {
 
-    JButton b1, b2, b3, b4, b5, b6, b7;
+    JButton amount1000Button, amount2000Button, amount3000Button,
+            amount5000Button, amount8000Button, amount10000Button, backButton;
     String pin;
-    UserDAO dao;
+    UserDAO userDAO;
+    private ATM atmFrame;
 
-    fastCash(String pin) {
+    /**
+     * Constructs a new FastCash frame.
+     *
+     * @param pin The PIN of the currently logged-in user, used to identify
+     * the account for withdrawal transactions.
+     */
+    fastCash(String pin, ATM atmFrame) {
         this.pin = pin;
-        this.dao = new UserDAO();
+        this.userDAO = new UserDAO();
+        this.atmFrame = atmFrame;
 
-        ImageIcon i1 = new ImageIcon("src/Images/backbg.png");
-        Image i2 = i1.getImage().getScaledInstance(1550, 830, Image.SCALE_DEFAULT);
-        ImageIcon i3 = new ImageIcon(i2);
-        JLabel l3 = new JLabel(i3);
-        l3.setBounds(0, 0, 1550, 830);
-        add(l3);
-
-        JLabel label = new JLabel("SELECT WITHDRAWL AMOUNT");
-        label.setBounds(445, 180, 700, 35);
-        label.setForeground(Color.WHITE);
-        label.setFont(new Font("System", Font.BOLD, 23));
-        l3.add(label);
-
-        b1 = new JButton("Rs. 100");
-        b1.setForeground(Color.WHITE);
-        b1.setBackground(new Color(65, 125, 128));
-        b1.setBounds(410, 274, 150, 35);
-        b1.addActionListener(this);
-        l3.add(b1);
-
-        b2 = new JButton("Rs. 500");
-        b2.setForeground(Color.WHITE);
-        b2.setBackground(new Color(65, 125, 128));
-        b2.setBounds(700, 274, 150, 35);
-        b2.addActionListener(this);
-        l3.add(b2);
-
-        b3 = new JButton("Rs. 1000");
-        b3.setForeground(Color.WHITE);
-        b3.setBackground(new Color(65, 125, 128));
-        b3.setBounds(410, 318, 150, 35);
-        b3.addActionListener(this);
-        l3.add(b3);
-
-        b4 = new JButton("Rs. 2000");
-        b4.setForeground(Color.WHITE);
-        b4.setBackground(new Color(65, 125, 128));
-        b4.setBounds(700, 318, 150, 35);
-        b4.addActionListener(this);
-        l3.add(b4);
-
-        b5 = new JButton("Rs. 5000");
-        b5.setForeground(Color.WHITE);
-        b5.setBackground(new Color(65, 125, 128));
-        b5.setBounds(410, 362, 150, 35);
-        b5.addActionListener(this);
-        l3.add(b5);
-
-        b6 = new JButton("Rs. 10000");
-        b6.setForeground(Color.WHITE);
-        b6.setBackground(new Color(65, 125, 128));
-        b6.setBounds(700, 362, 150, 35);
-        b6.addActionListener(this);
-        l3.add(b6);
-
-        b7 = new JButton("BACK");
-        b7.setForeground(Color.WHITE);
-        b7.setBackground(new Color(65, 125, 128));
-        b7.setBounds(700, 406, 150, 35);
-        b7.addActionListener(this);
-        l3.add(b7);
-
+        setTitle("Fast Cash Withdrawal");
+        getContentPane().setBackground(new Color(230, 240, 250));
         setLayout(null);
-        setSize(1550, 1080);
-        setLocation(0, 0);
-        setVisible(true);
+        setSize(700, 550);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
+        // Title label
+        JLabel titleLabel = new JLabel("SELECT WITHDRAWAL AMOUNT");
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 26));
+        titleLabel.setForeground(new Color(30, 60, 90));
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        titleLabel.setBounds(0, 50, getWidth(), 35);
+        add(titleLabel);
+
+        // Common button styling
+        Font buttonFont = new Font("Segoe UI", Font.BOLD, 16);
+        Color buttonBgColor = new Color(0, 102, 102);
+        Color buttonFgColor = Color.WHITE;
+        int buttonWidth = 200;
+        int buttonHeight = 45;
+        int horizontalGap = 50;
+        int verticalGap = 30;
+        int startXLeft = (getWidth() - (2 * buttonWidth + horizontalGap)) / 2;
+        int startXRight = startXLeft + buttonWidth + horizontalGap;
+        int startY = 150;
+
+        // Button 1: 1000 CZK
+        amount1000Button = new JButton("1000 CZK");
+        amount1000Button.setBounds(startXLeft, startY, buttonWidth, buttonHeight);
+        styleButton(amount1000Button, buttonFont, buttonBgColor, buttonFgColor);
+        amount1000Button.addActionListener(this);
+        add(amount1000Button);
+
+        // Button 2: 2000 CZK
+        amount2000Button = new JButton("2000 CZK");
+        amount2000Button.setBounds(startXRight, startY, buttonWidth, buttonHeight);
+        styleButton(amount2000Button, buttonFont, buttonBgColor, buttonFgColor);
+        amount2000Button.addActionListener(this);
+        add(amount2000Button);
+
+        // Button 3: 3000 CZK (New option)
+        amount3000Button = new JButton("3000 CZK");
+        amount3000Button.setBounds(startXLeft, startY + (buttonHeight + verticalGap), buttonWidth, buttonHeight);
+        styleButton(amount3000Button, buttonFont, buttonBgColor, buttonFgColor);
+        amount3000Button.addActionListener(this);
+        add(amount3000Button);
+
+        // Button 4: 5000 CZK
+        amount5000Button = new JButton("5000 CZK");
+        amount5000Button.setBounds(startXRight, startY + (buttonHeight + verticalGap), buttonWidth, buttonHeight);
+        styleButton(amount5000Button, buttonFont, buttonBgColor, buttonFgColor);
+        amount5000Button.addActionListener(this);
+        add(amount5000Button);
+
+        // Button 5: 8000 CZK (New option)
+        amount8000Button = new JButton("8000 CZK");
+        amount8000Button.setBounds(startXLeft, startY + 2 * (buttonHeight + verticalGap), buttonWidth, buttonHeight);
+        styleButton(amount8000Button, buttonFont, buttonBgColor, buttonFgColor);
+        amount8000Button.addActionListener(this);
+        add(amount8000Button);
+
+        // Button 6: 10000 CZK
+        amount10000Button = new JButton("10000 CZK");
+        amount10000Button.setBounds(startXRight, startY + 2 * (buttonHeight + verticalGap), buttonWidth, buttonHeight);
+        styleButton(amount10000Button, buttonFont, buttonBgColor, buttonFgColor);
+        amount10000Button.addActionListener(this);
+        add(amount10000Button);
+
+        // Back button
+        backButton = new JButton("BACK TO ATM");
+        backButton.setBounds((getWidth() - buttonWidth) / 2, startY + 3 * (buttonHeight + verticalGap) + 10, buttonWidth, buttonHeight); // Centered at bottom
+        backButton.setBackground(new Color(65, 125, 128));
+        backButton.setForeground(Color.WHITE);
+        backButton.setFont(buttonFont);
+        backButton.setFocusPainted(false);
+        backButton.addActionListener(this);
+        add(backButton);
+
+        setVisible(true);
     }
 
+    /**
+     * Applies consistent styling to a JButton.
+     *
+     * @param button  The JButton to style.
+     * @param font    The font to apply.
+     * @param bgColor The background color.
+     * @param fgColor The foreground (text) color.
+     */
+    private void styleButton(JButton button, Font font, Color bgColor, Color fgColor) {
+        button.setFont(font);
+        button.setBackground(bgColor);
+        button.setForeground(fgColor);
+        button.setOpaque(true);
+        button.setContentAreaFilled(true);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+    }
+
+    /**
+     * Handles action events generated by the buttons in the FastCash frame.
+     * This method processes the selected withdrawal amount or navigates back to the ATM menu.
+     *
+     * @param e The ActionEvent generated by a button click.
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == b7) {
-            setVisible(false);
-            new ATM(pin);
+        if (e.getSource() == backButton) {
+            this.dispose();
+            atmFrame.setVisible(true);
             return;
         }
 
-        String amountString = ((JButton) e.getSource()).getText().split(" ")[0]; // Get "100" from "100 CZK"
+        // extract only numbers from for example 1000 czk
+        String amountString = ((JButton) e.getSource()).getText().split(" ")[0];
         double withdrawalAmount;
 
         try {
             withdrawalAmount = Double.parseDouble(amountString);
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(null, "Error: Invalid amount selected. Please re-select.");
+            JOptionPane.showMessageDialog(this, "Error: Invalid amount selected. Please re-select.");
             ex.printStackTrace();
             return;
         }
 
-
-        if (dao.performDebitTransaction(pin, withdrawalAmount, "Fast Cash")) {
-            JOptionPane.showMessageDialog(null, withdrawalAmount + " CZK Debited Successfully.");
+        // Perform the debit transaction
+        if (userDAO.performDebitTransaction(pin, withdrawalAmount, "Fast Cash")) {
+            JOptionPane.showMessageDialog(this, String.format("%.2f CZK Debited Successfully.", withdrawalAmount));
             setVisible(false);
             new ATM(pin);
+            this.dispose();
         } else {
-            JOptionPane.showMessageDialog(null, "Transaction failed. Please try again or check balance.");
+
+            JOptionPane.showMessageDialog(this, "Transaction failed. Please try again or check your balance.");
         }
     }
-
 }

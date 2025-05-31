@@ -1,5 +1,6 @@
 package ATM;
 
+import databaseCON.DatabaseConnection;
 import databaseCON.UserDAO;
 import javax.swing.*;
 import java.awt.*;
@@ -11,75 +12,98 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * The DemoMoney class provides a graphical user interface for users to
+ * generate an initial amount of funds for their account. This is typically
+ * used for demonstration or initial setup purposes. It updates the user's
+ * balance and records the transaction.
+ */
 public class DemoMoney extends JFrame implements ActionListener {
 
     String pin;
     JTextField amountField;
     JButton generateButton, backButton;
     UserDAO userDAO;
+    private ATM atmFrame; // Reference to the main ATM frame
 
-    public DemoMoney(String pin) {
+    /**
+     * Constructs a new DemoMoney frame.
+     *
+     * @param pin The PIN of the currently logged-in user, used to identify
+     * the account for funding.
+     * @param atmFrame A reference to the main ATM frame, to which the application
+     * should return after closing this window.
+     */
+    public DemoMoney(String pin, ATM atmFrame) {
         this.pin = pin;
+        this.atmFrame = atmFrame;
         this.userDAO = new UserDAO();
 
         setTitle("Initial Account Funding");
-        getContentPane().setBackground(new Color(230, 240, 250)); // Light blue-grey background
-        setSize(600, 450); // Adjusted size for better layout
-        setLocationRelativeTo(null); // Center the window
+        getContentPane().setBackground(new Color(230, 240, 250));
+        setSize(600, 450);
+        setLocationRelativeTo(null);
         setLayout(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         // Main title label
         JLabel titleLabel = new JLabel("Initial Account Funding");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 28)); // Larger, modern font
-        titleLabel.setForeground(new Color(30, 60, 90)); // Dark blue-grey text
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER); // Center text
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        titleLabel.setForeground(new Color(30, 60, 90));
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleLabel.setBounds(0, 40, getWidth(), 35);
         add(titleLabel);
 
         // Instruction label
         JLabel instructionLabel = new JLabel("Enter amount (min 500 CZK):");
-        instructionLabel.setFont(new Font("Segoe UI", Font.PLAIN, 18)); // Clearer font
-        instructionLabel.setForeground(new Color(50, 50, 50)); // Darker grey for body text
+        instructionLabel.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+        instructionLabel.setForeground(new Color(50, 50, 50));
         instructionLabel.setBounds(80, 130, 350, 25);
         add(instructionLabel);
 
         // Amount input field
         amountField = new JTextField();
-        amountField.setFont(new Font("Consolas", Font.BOLD, 20)); // Monospaced for numbers
-        amountField.setBounds(400, 130, 150, 35); // Adjusted size and position
-        amountField.setBorder(BorderFactory.createLineBorder(new Color(150, 150, 150))); // Subtle border
-        amountField.setHorizontalAlignment(JTextField.RIGHT); // Align text to the right
+        amountField.setFont(new Font("Consolas", Font.BOLD, 20));
+        amountField.setBounds(400, 130, 150, 35);
+        amountField.setBorder(BorderFactory.createLineBorder(new Color(150, 150, 150)));
+        amountField.setHorizontalAlignment(JTextField.RIGHT);
         add(amountField);
 
         // Generate Funds button
         generateButton = new JButton("GENERATE FUNDS");
-        generateButton.setBackground(new Color(0, 102, 102)); // Teal button
+        generateButton.setBackground(new Color(0, 102, 102));
         generateButton.setForeground(Color.WHITE);
-        generateButton.setFont(new Font("Segoe UI", Font.BOLD, 16)); // Clear font
+        generateButton.setFont(new Font("Segoe UI", Font.BOLD, 16));
         generateButton.setFocusPainted(false);
-        generateButton.setBounds(100, 250, 190, 45); // Larger button
+        generateButton.setBounds(100, 250, 190, 45);
         generateButton.addActionListener(this);
         add(generateButton);
 
         // Back to ATM button
         backButton = new JButton("BACK TO ATM");
-        backButton.setBackground(new Color(65, 125, 128)); // Slightly different blue-green
+        backButton.setBackground(new Color(65, 125, 128));
         backButton.setForeground(Color.WHITE);
         backButton.setFont(new Font("Segoe UI", Font.BOLD, 16));
         backButton.setFocusPainted(false);
-        backButton.setBounds(310, 250, 190, 45); // Larger button
+        backButton.setBounds(310, 250, 190, 45);
         backButton.addActionListener(this);
         add(backButton);
 
         setVisible(true);
     }
 
+    /**
+     * Handles action events generated by the buttons in the DemoMoney frame.
+     * This method processes the fund generation or navigates back to the ATM menu.
+     *
+     * @param e The ActionEvent generated by a button click.
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == backButton) {
-            setVisible(false);
-            new ATM(pin);
+            this.dispose();
+            atmFrame.setVisible(true);
+            return;
         } else if (e.getSource() == generateButton) {
             String amountStr = amountField.getText();
 
@@ -100,14 +124,7 @@ public class DemoMoney extends JFrame implements ActionListener {
                 return;
             }
 
-            String cardNumber = userDAO.getCardNumberByPin(pin);
-
-            if (cardNumber == null) {
-                JOptionPane.showMessageDialog(this, "Error: Could not retrieve card number for this PIN. Please contact support.");
-                return;
-            }
-
-            double currentBalance = userDAO.getBalance(cardNumber);
+            double currentBalance = userDAO.getBalance(pin);
             if (currentBalance == -1.0) {
                 JOptionPane.showMessageDialog(this, "Error: Could not retrieve current balance. Please try again.");
                 return;
@@ -115,31 +132,64 @@ public class DemoMoney extends JFrame implements ActionListener {
 
             double newBalance = currentBalance + amount;
 
-            if (userDAO.updateBalance(cardNumber, newBalance)) {
-                JOptionPane.showMessageDialog(this, String.format("Funds generated successfully! Your new balance is: %.2f CZK", newBalance));
+            Connection con = null;
 
-                try (Connection con = databaseCON.DatabaseConnection.getConnection();
-                     PreparedStatement pstmt = con.prepareStatement("INSERT INTO bank (pin, date, type, amount) VALUES (?, ?, ?, ?)")) {
+            try {
+                con = DatabaseConnection.getConnection();
+                con.setAutoCommit(false); // Start transaction
 
+                // Update user's balance in the 'users' table
+                String updateBalanceQuery = "UPDATE users SET balance = ? WHERE pin = ?";
+                try (PreparedStatement pstmtUpdate = con.prepareStatement(updateBalanceQuery)) {
+                    pstmtUpdate.setDouble(1, newBalance);
+                    pstmtUpdate.setString(2, pin);
+                    int rowsAffectedUpdate = pstmtUpdate.executeUpdate();
+                    if (rowsAffectedUpdate == 0) { // Check if update actually affected a row
+                        con.rollback(); // Rollback if balance update fails
+                        JOptionPane.showMessageDialog(this, "Funds generation failed: Could not update balance. Please try again.");
+                        return;
+                    }
+                }
+
+                //  Record transaction in the 'bank' table
+                String insertTransactionQuery = "INSERT INTO bank (pin, date, type, amount) VALUES (?, ?, ?, ?)";
+                try (PreparedStatement pstmtInsert = con.prepareStatement(insertTransactionQuery)) {
                     Date date = new Date();
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     String formattedDate = dateFormat.format(date);
 
-                    pstmt.setString(1, pin);
-                    pstmt.setString(2, formattedDate);
-                    pstmt.setString(3, "Initial Deposit");
-                    pstmt.setDouble(4, amount);
-                    pstmt.executeUpdate();
-
-                } catch (SQLException ex) {
-                    System.err.println("SQL Error recording initial deposit transaction: " + ex.getMessage());
-                    ex.printStackTrace();
+                    pstmtInsert.setString(1, pin);
+                    pstmtInsert.setString(2, formattedDate);
+                    pstmtInsert.setString(3, "Initial Deposit");
+                    pstmtInsert.setDouble(4, amount);
+                    pstmtInsert.executeUpdate();
                 }
 
-                setVisible(false);
-                new ATM(pin);
-            } else {
-                JOptionPane.showMessageDialog(this, "Failed to generate funds. Please try again.");
+                con.commit(); // Commit if both operations succeed
+                JOptionPane.showMessageDialog(this, String.format("Funds generated successfully! Your new balance is: %.2f CZK", newBalance));
+                this.dispose();
+                atmFrame.setVisible(true);
+
+            } catch (SQLException ex) {
+                System.err.println("SQL Error recording initial deposit transaction: " + ex.getMessage());
+                ex.printStackTrace();
+                if (con != null) {
+                    try {
+                        con.rollback(); // Rollback on error
+                    } catch (SQLException rollbackEx) {
+                        System.err.println("Error during rollback: " + rollbackEx.getMessage());
+                    }
+                }
+                JOptionPane.showMessageDialog(this, "An error occurred during funds generation. Please try again.");
+            } finally {
+                if (con != null) {
+                    try {
+                        con.setAutoCommit(true); // Reset auto-commit
+                        con.close(); // Close connection
+                    } catch (SQLException closeEx) {
+                        System.err.println("Error closing connection: " + closeEx.getMessage());
+                    }
+                }
             }
         }
     }

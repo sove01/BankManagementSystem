@@ -1,7 +1,7 @@
 package databaseCON;
 
 import javax.swing.*;
-import javax.xml.crypto.Data;
+import javax.xml.crypto.Data; // This import seems unused, can be removed
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -20,6 +20,8 @@ public class UserDAO {
      */
     public boolean insertNewUserFromSignUp(User user) {
         // SQL query to insert all user details into the 'users' table.
+        // NOTE: If 'cardNumber' is not in your 'users' table, you must remove it from here too.
+        // Assuming your 'users' table has 'firstName, ..., pin, homeAddress, cardNumber'
         String query = "INSERT INTO users (" +
                 "firstName, lastName, nationality, region, city, " +
                 "phoneNumber, email, gender, maritalStatus, pin, homeAddress, cardNumber" +
@@ -38,9 +40,9 @@ public class UserDAO {
             pstmt.setString(7, user.getEmail());
             pstmt.setString(8, user.getGender());
             pstmt.setString(9, user.getMaritalStatus());
-            pstmt.setString(10, user.getPin()); // security risk
+            pstmt.setString(10, user.getPin());
             pstmt.setString(11, user.getHomeAddress());
-            pstmt.setString(12, user.getCardNumber());
+            pstmt.setString(12, user.getCardNumber()); // Make sure 'cardNumber' exists in 'users' table if used here
 
             int rowsAffected = pstmt.executeUpdate();
             return rowsAffected > 0;
@@ -53,7 +55,7 @@ public class UserDAO {
     }
 
     /**
-     * Validates user login credentials against the 'login' table.
+     * Validates user login credentials against the 'users' table.
      * IMPORTANT: This method assumes card_number and pin are stored in plain text.
      * For a secure application, PINs should be hashed and salted.
      *
@@ -62,6 +64,7 @@ public class UserDAO {
      * @return true if the credentials are valid, false otherwise.
      */
     public boolean validateLogin(String cardNum, String PIN) {
+        // Ensure 'cardNumber' column exists in 'users' table or change to 'pin' if appropriate for login
         String query = "SELECT 1 FROM users WHERE cardNumber = ? AND pin = ?";
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement pstmt = con.prepareStatement(query)) {
@@ -78,42 +81,43 @@ public class UserDAO {
     }
 
     /**
-     * Retrieves the current balance for a given card number.
-     *
-     * @param cardNumber The user's card number.
-     * @return The current balance, or -1.0 if an error occurs or user not found.
+     * Retrieves the current balance for a given PIN.
+     * @param pin The user's PIN.
+     * @return The current balance, or -1.0 if an error occurs or PIN not found.
      */
-    public double getBalance(String cardNumber) {
-        double balance = -1.0; // Default error value
-        String query = "SELECT balance FROM users WHERE cardNumber = ?";
+    public double getBalance(String pin) {
+        double balance = -1.0;
+        // Query to get balance based on PIN
+        String query = "SELECT balance FROM users WHERE pin = ?";
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement pstmt = con.prepareStatement(query)) {
-            pstmt.setString(1, cardNumber);
+            pstmt.setString(1, pin);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     balance = rs.getDouble("balance");
                 }
             }
         } catch (SQLException e) {
-            System.err.println("SQL Error getting balance: " + e.getMessage());
+            System.err.println("SQL Error in getBalance: " + e.getMessage());
             e.printStackTrace();
         }
         return balance;
     }
 
     /**
-     * Updates the balance for a given card number.
+     * Updates the balance for a given PIN.
+     * This method now uses the PIN to identify the user for balance update.
      *
-     * @param cardNumber The user's card number.
+     * @param pin The user's PIN.
      * @param newBalance The new balance to set.
      * @return true if the balance was successfully updated, false otherwise.
      */
-    public boolean updateBalance(String cardNumber, double newBalance) {
-        String query = "UPDATE users SET balance = ? WHERE cardNumber = ?";
+    public boolean updateBalance(String pin, double newBalance) { // CHANGE: Parameter changed from cardNumber to pin
+        String query = "UPDATE users SET balance = ? WHERE pin = ?"; // CHANGE: WHERE clause now uses pin
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement pstmt = con.prepareStatement(query)) {
             pstmt.setDouble(1, newBalance);
-            pstmt.setString(2, cardNumber);
+            pstmt.setString(2, pin); // CHANGE: Use pin here
             int rowsAffected = pstmt.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLException e) {
@@ -123,23 +127,8 @@ public class UserDAO {
         }
     }
 
-    public String getCardNumberByPin(String pin) {
-        String cardNumber = null;
-        String query = "SELECT cardNumber FROM users WHERE pin = ?";
-        try (Connection con = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = con.prepareStatement(query)) {
-            pstmt.setString(1, pin);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    cardNumber = rs.getString("cardNumber");
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("SQL Error getting card number by PIN: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return cardNumber;
-    }
+    // REMOVED: public String getCardNumberByPin(String pin) { ... }
+    // This method is no longer needed if you're using PIN as the primary identifier for balances.
 
     /**
      * Checks if a given email address is already registered in the 'users' table.
@@ -206,75 +195,61 @@ public class UserDAO {
         }
     }
 
+
     /**
-     * Performs a debit transaction (withdrawal or fast cash).
-     * It checks balance, updates the user's balance in the 'users' table,
-     * and records the transaction in the 'bank' table.
+     * Performs a debit transaction (withdrawal or fast cash) for a user.
+     * This method now includes the balance check and is transactional.
      *
-     * @param pin             The user's PIN (used to find the card number and for bank table).
-     * @param amount          The amount to debit.
-     * @param transactionType The type of transaction (e.g., "Withdrawal", "Fast Cash").
-     * @return true if the debit is successful, false otherwise (e.g., insufficient balance, DB error).
+     * @param pin The user's PIN.
+     * @param amount The amount to debit.
+     * @param type The type of transaction (e.g., "Withdrawal", "Fast Cash").
+     * @return true if the transaction was successful, false otherwise (e.g., insufficient funds, database error).
      */
-    public boolean performDebitTransaction(String pin, double amount, String transactionType) {
-        String cardNumber = getCardNumberByPin(pin);
-        if (cardNumber == null) {
-            System.err.println("Error: Card number not found for PIN: " + pin);
-            return false;
+    public boolean performDebitTransaction(String pin, double amount, String type) {
+        // String cardNumber = getCardNumberByPin(pin); // This line should be commented out or removed if no longer using cardNumber in UserDAO for balance
+
+        double currentBalance = getBalance(pin); // Correctly uses pin
+        if (currentBalance == -1.0) {
+            System.err.println("Error: Could not retrieve current balance for PIN: " + pin);
+            return false; // Error fetching balance or PIN not found
         }
 
+        if (currentBalance < amount) {
+            System.out.println("Insufficient funds for withdrawal. Current balance: " + currentBalance + ", requested: " + amount);
+            return false; // Insufficient funds, return false
+        }
+
+        double newBalance = currentBalance - amount;
+
         Connection con = null;
-        PreparedStatement pstmtUpdateUsers = null;
-        PreparedStatement pstmtInsertBank = null;
         try {
             con = DatabaseConnection.getConnection();
-            con.setAutoCommit(false);
+            con.setAutoCommit(false); // Start transaction for atomicity
 
-
-            double currentBalance = getBalance(cardNumber);
-            if (currentBalance == -1.0) {
-                con.rollback();
-                return false;
+            // 1. Update user's balance in the 'users' table using PIN
+            String updateBalanceQuery = "UPDATE users SET balance = ? WHERE pin = ?"; // Correctly uses pin
+            try (PreparedStatement pstmt1 = con.prepareStatement(updateBalanceQuery)) {
+                pstmt1.setDouble(1, newBalance);
+                pstmt1.setString(2, pin);
+                int rowsAffected = pstmt1.executeUpdate();
+                if (rowsAffected == 0) {
+                    con.rollback();
+                    return false;
+                }
             }
 
-            if (currentBalance < amount) {
-                JOptionPane.showMessageDialog(null, "Insufficient Balance.");
-                con.rollback(); // Rollback any changes if balance is low
-                return false;
-            }
+            // 2. Record transaction in the 'bank' table (this table should still use 'pin' as you had it)
+            String insertTransactionQuery = "INSERT INTO bank (pin, date, type, amount) VALUES (?, ?, ?, ?)";
+            try (PreparedStatement pstmt2 = con.prepareStatement(insertTransactionQuery)) {
+                Date date = new Date();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String formattedDate = dateFormat.format(date);
 
-
-            double newBalance = currentBalance - amount;
-
-            String updateUsersQuery = "UPDATE users SET balance = ? WHERE cardNumber = ?";
-            pstmtUpdateUsers = con.prepareStatement(updateUsersQuery);
-            pstmtUpdateUsers.setDouble(1, newBalance);
-            pstmtUpdateUsers.setString(2, cardNumber);
-            int usersRowsAffected = pstmtUpdateUsers.executeUpdate();
-
-            if (usersRowsAffected == 0) {
-                System.err.println("Failed to update user balance for card: " + cardNumber);
-                con.rollback();
-                return false;
-            }
-
-
-            Date date = new Date();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String formattedDate = dateFormat.format(date);
-
-            String insertBankQuery = "INSERT INTO bank (pin, date, type, amount) VALUES (?, ?, ?, ?)";
-            pstmtInsertBank = con.prepareStatement(insertBankQuery);
-            pstmtInsertBank.setString(1, pin);
-            pstmtInsertBank.setString(2, formattedDate);
-            pstmtInsertBank.setString(3, transactionType); //fastcash and withdrawl
-            pstmtInsertBank.setDouble(4, amount);
-            int bankRowsAffected = pstmtInsertBank.executeUpdate();
-
-            if (bankRowsAffected == 0) {
-                System.err.println("Failed to record transaction in bank table for card: " + cardNumber);
-                con.rollback();
-                return false;
+                pstmt2.setString(1, pin);
+                pstmt2.setString(2, formattedDate);
+                pstmt2.setString(3, type);
+                pstmt2.setDouble(4, amount);
+                pstmt2.executeUpdate();
             }
 
             con.commit();
@@ -283,24 +258,44 @@ public class UserDAO {
         } catch (SQLException e) {
             System.err.println("SQL Error during debit transaction: " + e.getMessage());
             e.printStackTrace();
-            try {
-                if (con != null) con.rollback(); // rollback balance if error happens
-            } catch (SQLException ex) {
-                System.err.println("Error rolling back transaction: " + ex.getMessage());
+            if (con != null) {
+                try {
+                    con.rollback();
+                } catch (SQLException ex) {
+                    System.err.println("Error during rollback: " + ex.getMessage());
+                }
             }
             return false;
         } finally {
-            try {
-                if (pstmtUpdateUsers != null) pstmtUpdateUsers.close();
-                if (pstmtInsertBank != null) pstmtInsertBank.close();
-                if (con != null) con.setAutoCommit(true);
-                if (con != null) con.close();
-            } catch (SQLException e) {
-                System.err.println("Error closing resources: " + e.getMessage());
+            if (con != null) {
+                try {
+                    con.setAutoCommit(true);
+                    con.close();
+                } catch (SQLException e) {
+                    System.err.println("Error closing connection: " + e.getMessage());
+                }
             }
         }
     }
 
+    public String getCardNumberByPin(String pin) {
+        String cardNumber = null;
+        // Ensure 'users' table has a 'cardNumber' column
+        String query = "SELECT cardNumber FROM users WHERE pin = ?";
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(query)) {
+            pstmt.setString(1, pin);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    cardNumber = rs.getString("cardNumber");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("SQL Error getting card number by PIN: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return cardNumber;
+    }
     /**
      * Validates the format of a phone number using a regular expression.
      *

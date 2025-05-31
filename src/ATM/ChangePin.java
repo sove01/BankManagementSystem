@@ -1,91 +1,121 @@
 package ATM;
 
-import databaseCON.UserDAO; // Import UserDAO
+import databaseCON.UserDAO;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * The ChangePin class provides a graphical user interface for users to change their ATM PIN.
+ * It validates the old PIN and ensures the new PIN meets requirements before updating it in the database.
+ */
 public class ChangePin extends JFrame implements ActionListener {
 
-    String pin;
-    JPasswordField oldPinField, newPinField, reEnterPinField;
-    JButton changeButton, backButton;
-    UserDAO userDAO;
+    private String pin;
+    private JPasswordField oldPinField, newPinField, reEnterPinField;
+    private JButton changeButton, backButton;
+    private UserDAO userDAO;
+    private ATM atmFrame;
 
-    public ChangePin(String pin) {
+    /**
+     * Constructs a new ChangePin frame.
+     *
+     * @param pin The current PIN of the logged-in user.
+     */
+    public ChangePin(String pin, ATM atmFrame) {
         this.pin = pin;
         this.userDAO = new UserDAO();
+        this.atmFrame = atmFrame;
 
-        setTitle("PIN Change");
+        setTitle("Change PIN");
+        getContentPane().setBackground(new Color(230, 240, 250));
         setLayout(null);
-        setSize(800, 500);
-        setLocation(400, 150);
-        getContentPane().setBackground(new Color(186, 35, 98));
+        setSize(600, 450);
+        setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         JLabel titleLabel = new JLabel("CHANGE YOUR PIN");
-        titleLabel.setFont(new Font("System", Font.BOLD, 25));
-        titleLabel.setForeground(Color.WHITE);
-        titleLabel.setBounds(280, 50, 300, 30);
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        titleLabel.setForeground(new Color(30, 60, 90));
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        titleLabel.setBounds(0, 40, getWidth(), 35);
         add(titleLabel);
 
+        JSeparator separator = new JSeparator();
+        separator.setBounds(50, 95, 500, 2);
+        separator.setForeground(new Color(180, 180, 180));
+        add(separator);
+
         JLabel oldPinLabel = new JLabel("Old PIN:");
-        oldPinLabel.setFont(new Font("System", Font.PLAIN, 18));
-        oldPinLabel.setForeground(Color.WHITE);
-        oldPinLabel.setBounds(150, 120, 150, 30);
+        oldPinLabel.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+        oldPinLabel.setForeground(new Color(50, 50, 50));
+        oldPinLabel.setBounds(100, 140, 150, 30);
         add(oldPinLabel);
 
-        oldPinField = new JPasswordField(4); // Assuming PINs are 4 digits
-        oldPinField.setFont(new Font("Raleway", Font.BOLD, 18));
-        oldPinField.setBounds(350, 120, 200, 30);
+        oldPinField = new JPasswordField(4);
+        oldPinField.setFont(new Font("Consolas", Font.BOLD, 18));
+        oldPinField.setBounds(300, 140, 200, 30);
+        oldPinField.setBorder(BorderFactory.createLineBorder(new Color(150, 150, 150)));
         add(oldPinField);
 
         JLabel newPinLabel = new JLabel("New PIN:");
-        newPinLabel.setFont(new Font("System", Font.PLAIN, 18));
-        newPinLabel.setForeground(Color.WHITE);
-        newPinLabel.setBounds(150, 170, 150, 30);
+        newPinLabel.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+        newPinLabel.setForeground(new Color(50, 50, 50));
+        newPinLabel.setBounds(100, 190, 150, 30);
         add(newPinLabel);
 
         newPinField = new JPasswordField(4);
-        newPinField.setFont(new Font("Raleway", Font.BOLD, 18));
-        newPinField.setBounds(350, 170, 200, 30);
+        newPinField.setFont(new Font("Consolas", Font.BOLD, 18));
+        newPinField.setBounds(300, 190, 200, 30);
+        newPinField.setBorder(BorderFactory.createLineBorder(new Color(150, 150, 150)));
         add(newPinField);
 
         JLabel reEnterPinLabel = new JLabel("Re-Enter New PIN:");
-        reEnterPinLabel.setFont(new Font("System", Font.PLAIN, 18));
-        reEnterPinLabel.setForeground(Color.WHITE);
-        reEnterPinLabel.setBounds(150, 220, 200, 30);
+        reEnterPinLabel.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+        reEnterPinLabel.setForeground(new Color(50, 50, 50));
+        reEnterPinLabel.setBounds(100, 240, 200, 30);
         add(reEnterPinLabel);
 
         reEnterPinField = new JPasswordField(4);
-        reEnterPinField.setFont(new Font("Raleway", Font.BOLD, 18));
-        reEnterPinField.setBounds(350, 220, 200, 30);
+        reEnterPinField.setFont(new Font("Consolas", Font.BOLD, 18));
+        reEnterPinField.setBounds(300, 240, 200, 30);
+        reEnterPinField.setBorder(BorderFactory.createLineBorder(new Color(150, 150, 150)));
         add(reEnterPinField);
 
-        changeButton = new JButton("CHANGE");
-        changeButton.setBackground(Color.BLACK);
+        changeButton = new JButton("CHANGE PIN");
+        changeButton.setBackground(new Color(0, 102, 102));
         changeButton.setForeground(Color.WHITE);
-        changeButton.setBounds(200, 300, 150, 40);
+        changeButton.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        changeButton.setFocusPainted(false);
+        changeButton.setBounds(120, 330, 180, 45);
         changeButton.addActionListener(this);
         add(changeButton);
 
-        backButton = new JButton("BACK");
-        backButton.setBackground(Color.BLACK);
+        backButton = new JButton("BACK TO ATM");
+        backButton.setBackground(new Color(65, 125, 128));
         backButton.setForeground(Color.WHITE);
-        backButton.setBounds(400, 300, 150, 40);
+        backButton.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        backButton.setFocusPainted(false);
+        backButton.setBounds(320, 330, 180, 45);
         backButton.addActionListener(this);
         add(backButton);
 
         setVisible(true);
     }
 
+    /**
+     * Handles action events generated by the buttons in the ChangePin frame.
+     * Processes PIN change requests or navigates back to the ATM menu.
+     *
+     * @param e The ActionEvent generated by a button click.
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == backButton) {
             setVisible(false);
-            new ATM(pin); // Go back to ATM main menu
+            new ATM(pin);
         } else if (e.getSource() == changeButton) {
             String oldPin = new String(oldPinField.getPassword()).trim();
             String newPin = new String(newPinField.getPassword()).trim();
@@ -111,21 +141,20 @@ public class ChangePin extends JFrame implements ActionListener {
                 return;
             }
 
-            //current pin
+            // Verify current pin
             if (!this.pin.equals(oldPin)) {
                 JOptionPane.showMessageDialog(this, "Old PIN entered is incorrect.");
                 return;
             }
 
-
-            // update pin in db
+            // Update pin in database
             if (userDAO.updatePin(oldPin, newPin)) {
                 JOptionPane.showMessageDialog(this, "PIN changed successfully!");
                 // Update the 'pin' in the current ATM session
                 this.pin = newPin;
 
-                setVisible(false);
-                new ATM(this.pin); // changes old to new in the atm
+                this.dispose();
+                atmFrame.setVisible(true);
             } else {
                 JOptionPane.showMessageDialog(this, "Failed to change PIN. Please try again.");
             }
