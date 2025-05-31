@@ -7,14 +7,19 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Random;
 
+/**
+ * The SignUp2 class represents the second page of the new user application form.
+ * It collects additional personal details such as address, phone, email, gender,
+ * and marital status, then registers the user in the database.
+ */
 public class SignUp2 extends JFrame implements ActionListener {
     JRadioButton marriedButton, unmarriedButton, otherButton, maleButton, femaleButton, otherGenderButton;
-    JButton nextSignUp;
-    JTextField homeAddressText, phoneNumberText, emailText;
+    JButton nextSignUpButton;
+    JTextField homeAddressField, phoneNumberField, emailField; // Renamed for clarity
+
+    // data passed from first signup
     private String firstName;
     private String lastName;
     private String nationality;
@@ -22,9 +27,21 @@ public class SignUp2 extends JFrame implements ActionListener {
     private String city;
     private String pin;
 
+    /**
+     * Constructs a new SignUp2 frame for the second page of the application.
+     * Initializes the GUI components for additional personal details and handles user registration.
+     *
+     * @param firstName The first name from SignUp page 1.
+     * @param lastName The last name from SignUp page 1.
+     * @param nationality The nationality from SignUp page 1.
+     * @param region The region from SignUp page 1.
+     * @param city The city from SignUp page 1.
+     * @param pin The PIN from SignUp page 1.
+     */
     public SignUp2(String firstName, String lastName, String nationality, String region, String city, String pin) {
-        super("APPLICATION FORM - SEQUEL");
+        super("APPLICATION FORM - Page 2");
 
+        // Initialize fields with data from the previous page
         this.firstName = firstName;
         this.lastName = lastName;
         this.nationality = nationality;
@@ -32,67 +49,101 @@ public class SignUp2 extends JFrame implements ActionListener {
         this.city = city;
         this.pin = pin;
 
+        // Main frame setup
+        getContentPane().setBackground(new Color(220, 230, 240));
+        setLayout(null);
+        setSize(850, 800);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // Bank icon label
         ImageIcon bankIcon = new ImageIcon("src/Images/bank.png");
-        Image image = bankIcon.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
+        Image image = bankIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
         ImageIcon icon = new ImageIcon(image);
         JLabel bankLabel = new JLabel(icon);
-        bankLabel.setBounds(45, 10, 120, 120);
+        bankLabel.setBounds(60, 20, 100, 100);
         add(bankLabel);
 
-        JLabel page1 = new JLabel("Page 2");
-        page1.setBounds(380, 70, 600, 45);
-        page1.setFont(new Font("Times New Roman", Font.PLAIN, 25));
-        add(page1);
+        // Page 2 indicator label
+        JLabel page2Label = new JLabel("Page 2: Contact & Other Details");
+        page2Label.setBounds(200, 75, 400, 30);
+        page2Label.setFont(new Font("Segoe UI", Font.ITALIC, 20));
+        page2Label.setForeground(new Color(50, 80, 120));
+        add(page2Label);
 
-        JLabel address = new JLabel("Address:");
-        address.setBounds(100, 190, 150, 30);
-        address.setFont(new Font("Times New Roman", Font.PLAIN, 15));
-        add(address);
+        // Section title: Contact Information
+        JLabel contactInfoTitle = new JLabel("Contact Information");
+        contactInfoTitle.setBounds(100, 150, 400, 35);
+        contactInfoTitle.setFont(new Font("Segoe UI", Font.BOLD, 26));
+        contactInfoTitle.setForeground(new Color(0, 102, 102));
+        add(contactInfoTitle);
 
-        homeAddressText = new JTextField();
-        homeAddressText.setBounds(300, 190, 300, 30);
-        homeAddressText.setFont(new Font("Times New Roman", Font.PLAIN, 15));
-        add(homeAddressText);
+        // Address label
+        JLabel addressLabel = new JLabel("Home Address:");
+        addressLabel.setBounds(100, 210, 150, 25);
+        addressLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        add(addressLabel);
 
+        // Address text field
+        homeAddressField = new JTextField();
+        homeAddressField.setBounds(250, 210, 400, 30);
+        homeAddressField.setFont(new Font("Arial", Font.PLAIN, 16));
+        add(homeAddressField);
+
+        // Phone Number label
         JLabel phoneNumberLabel = new JLabel("Phone Number:");
-        phoneNumberLabel.setBounds(100, 240, 150, 30);
-        phoneNumberLabel.setFont(new Font("Times New Roman", Font.PLAIN, 15));
+        phoneNumberLabel.setBounds(100, 260, 150, 25);
+        phoneNumberLabel.setFont(new Font("Arial", Font.PLAIN, 16));
         add(phoneNumberLabel);
 
-        phoneNumberText = new JTextField();
-        phoneNumberText.setBounds(300, 240, 300, 30);
-        phoneNumberText.setFont(new Font("Times New Roman", Font.PLAIN, 15));
-        add(phoneNumberText);
+        // Phone Number text field
+        phoneNumberField = new JTextField();
+        phoneNumberField.setBounds(250, 260, 300, 30);
+        phoneNumberField.setFont(new Font("Arial", Font.PLAIN, 16));
+        add(phoneNumberField);
 
-        JLabel emailLabel = new JLabel("Email:");
-        emailLabel.setBounds(100, 290, 100, 30);
-        emailLabel.setFont(new Font("Times New Roman", Font.PLAIN, 15));
+        // Email label
+        JLabel emailLabel = new JLabel("Email Address:");
+        emailLabel.setBounds(100, 310, 150, 25);
+        emailLabel.setFont(new Font("Arial", Font.PLAIN, 16));
         add(emailLabel);
 
-        emailText = new JTextField();
-        emailText.setBounds(300, 290, 300, 30);
-        emailText.setFont(new Font("Times New Roman", Font.PLAIN, 15));
-        add(emailText);
+        // Email text field
+        emailField = new JTextField();
+        emailField.setBounds(250, 310, 300, 30);
+        emailField.setFont(new Font("Arial", Font.PLAIN, 16));
+        add(emailField);
 
+        // Section title: Other Details
+        JLabel otherDetailsTitle = new JLabel("Other Details");
+        otherDetailsTitle.setBounds(100, 380, 400, 35);
+        otherDetailsTitle.setFont(new Font("Segoe UI", Font.BOLD, 26));
+        otherDetailsTitle.setForeground(new Color(0, 102, 102));
+        add(otherDetailsTitle);
+
+        // Gender label
         JLabel genderLabel = new JLabel("Gender:");
-        genderLabel.setFont(new Font("Raleway", Font.BOLD, 15));
-        genderLabel.setBounds(100, 340, 100, 30);
+        genderLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        genderLabel.setBounds(100, 440, 100, 25);
         add(genderLabel);
 
+        // Gender radio buttons
         maleButton = new JRadioButton("Male");
-        maleButton.setBounds(300, 340, 100, 30);
-        maleButton.setFont(new Font("Times New Roman", Font.BOLD, 15));
-        maleButton.setBackground(new Color(186, 35, 98));
+        maleButton.setBounds(250, 440, 100, 25);
+        maleButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        maleButton.setBackground(new Color(220, 230, 240));
         add(maleButton);
+
         femaleButton = new JRadioButton("Female");
-        femaleButton.setBounds(450, 340, 100, 30);
-        femaleButton.setFont(new Font("Times New Roman", Font.BOLD, 15));
-        femaleButton.setBackground(new Color(186, 35, 98));
+        femaleButton.setBounds(370, 440, 100, 25);
+        femaleButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        femaleButton.setBackground(new Color(220, 230, 240));
         add(femaleButton);
+
         otherGenderButton = new JRadioButton("Other");
-        otherGenderButton.setBounds(600, 340, 100, 30);
-        otherGenderButton.setFont(new Font("Times New Roman", Font.BOLD, 15));
-        otherGenderButton.setBackground(new Color(186, 35, 98));
+        otherGenderButton.setBounds(490, 440, 150, 25);
+        otherGenderButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        otherGenderButton.setBackground(new Color(220, 230, 240));
         add(otherGenderButton);
 
         ButtonGroup genderButtons = new ButtonGroup();
@@ -100,27 +151,29 @@ public class SignUp2 extends JFrame implements ActionListener {
         genderButtons.add(femaleButton);
         genderButtons.add(otherGenderButton);
 
+        // Marital Status label
         JLabel maritalStatusLabel = new JLabel("Marital Status:");
-        maritalStatusLabel.setFont(new Font("Raleway", Font.BOLD, 15));
-        maritalStatusLabel.setBounds(100, 390, 200, 30);
+        maritalStatusLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        maritalStatusLabel.setBounds(100, 490, 150, 25);
         add(maritalStatusLabel);
 
+        // Marital Status radio buttons
         marriedButton = new JRadioButton("Married");
-        marriedButton.setBounds(250, 390, 100, 30);
-        marriedButton.setBackground(new Color(186, 35, 98));
-        marriedButton.setFont(new Font("Raleway", Font.BOLD, 15));
+        marriedButton.setBounds(250, 490, 100, 25);
+        marriedButton.setBackground(new Color(220, 230, 240));
+        marriedButton.setFont(new Font("Arial", Font.PLAIN, 16));
         add(marriedButton);
 
         unmarriedButton = new JRadioButton("Unmarried");
-        unmarriedButton.setBackground(new Color(186, 35, 98));
-        unmarriedButton.setBounds(400, 390, 120, 30);
-        unmarriedButton.setFont(new Font("Raleway", Font.BOLD, 15));
+        unmarriedButton.setBackground(new Color(220, 230, 240));
+        unmarriedButton.setBounds(370, 490, 120, 25);
+        unmarriedButton.setFont(new Font("Arial", Font.PLAIN, 16));
         add(unmarriedButton);
 
         otherButton = new JRadioButton("Other");
-        otherButton.setBackground(new Color(186, 35, 98));
-        otherButton.setBounds(550, 390, 100, 30);
-        otherButton.setFont(new Font("Raleway", Font.BOLD, 15));
+        otherButton.setBackground(new Color(220, 230, 240));
+        otherButton.setBounds(490, 490, 100, 25);
+        otherButton.setFont(new Font("Arial", Font.PLAIN, 16));
         add(otherButton);
 
         ButtonGroup maritalStatusButtons = new ButtonGroup();
@@ -128,28 +181,31 @@ public class SignUp2 extends JFrame implements ActionListener {
         maritalStatusButtons.add(unmarriedButton);
         maritalStatusButtons.add(otherButton);
 
-        nextSignUp = new JButton("Next");
-        nextSignUp.setBounds(700, 720, 80, 30);
-        nextSignUp.setFont(new Font("Times New Roman", Font.PLAIN, 15));
-        nextSignUp.setBackground(Color.BLACK);
-        nextSignUp.setForeground(Color.WHITE);
-        nextSignUp.addActionListener(this);
-        add(nextSignUp);
+        // Next button
+        nextSignUpButton = new JButton("REGISTER");
+        nextSignUpButton.setBounds(650, 680, 150, 45);
+        nextSignUpButton.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        nextSignUpButton.setBackground(new Color(0, 102, 102));
+        nextSignUpButton.setForeground(Color.WHITE);
+        nextSignUpButton.setFocusPainted(false);
+        nextSignUpButton.addActionListener(this);
+        add(nextSignUpButton);
 
-        getContentPane().setBackground(new Color(186, 35, 98));
-        setLayout(null);
-        setSize(850, 800);
-        setLocation(360, 40);
         setVisible(true);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
+    /**
+     * Handles action events generated by the 'REGISTER' button.
+     * Validates input fields, generates a card number, and registers the user in the database.
+     *
+     * @param e The ActionEvent generated by the button click.
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == nextSignUp) {
-            String homeAddress = homeAddressText.getText().trim();
-            String phoneNumber = phoneNumberText.getText().trim();
-            String email = emailText.getText().trim();
+        if (e.getSource() == nextSignUpButton) {
+            String homeAddress = homeAddressField.getText().trim();
+            String phoneNumber = phoneNumberField.getText().trim();
+            String email = emailField.getText().trim();
 
             String currentSelectedGender = "";
             if (maleButton.isSelected()) {
@@ -183,29 +239,34 @@ public class SignUp2 extends JFrame implements ActionListener {
             UserDAO dao = new UserDAO();
 
             if (!dao.validateEmail(email)) {
-                JOptionPane.showMessageDialog(this, "Invalid email format.");
+                JOptionPane.showMessageDialog(this, "Invalid email format. Please use a valid email address.");
                 return;
             }
             if (dao.isEmailRegistered(email)) {
-                JOptionPane.showMessageDialog(this, "Email already in use.");
+                JOptionPane.showMessageDialog(this, "Email already in use. Please use a different email.");
                 return;
             }
             if (!dao.validatePhone(phoneNumber)) {
-                JOptionPane.showMessageDialog(this, "Invalid phone number.");
+                JOptionPane.showMessageDialog(this, "Invalid phone number format. Expected: +420XXXXXXXXX.");
                 return;
             }
             if (dao.isPhoneNumberRegistered(phoneNumber)) {
-                JOptionPane.showMessageDialog(this, "Phone number already in use.");
+                JOptionPane.showMessageDialog(this, "Phone number already in use. Please use a different number.");
                 return;
             }
+
+            // Generate a unique card number
             String newCardNumber = generateRandomCardNumber();
+
+            // Create a new User object with all collected data
             User newUser = new User(
                     firstName, lastName, nationality, region, city,
                     phoneNumber, email, currentSelectedGender, currentMaritalStatus, pin, homeAddress, newCardNumber
             );
 
+            // Insert the new user into the database
             if (dao.insertNewUserFromSignUp(newUser)) {
-                JOptionPane.showMessageDialog(this, "User registered successfully!");
+                JOptionPane.showMessageDialog(this, "User registered successfully! Your new Card Number is: " + newCardNumber + "\nPlease keep it safe for login.");
                 this.dispose();
                 new SignUps.Login();
             } else {
@@ -216,13 +277,14 @@ public class SignUp2 extends JFrame implements ActionListener {
 
     /**
      * Generates a random 16-digit card number.
+     * This is a simplified generation. In a real banking system, card numbers
+     * follow specific algorithms (like Luhn algorithm) and are checked for uniqueness.
      *
-     * @return A 16-digit string representing a card number.
+     * @return A 16-digit string representing a generated card number.
      */
     private String generateRandomCardNumber() {
         Random random = new Random();
         StringBuilder sb = new StringBuilder();
-        // A simple way to ensure 16 digits, but NO LUHN ALGO
         for (int i = 0; i < 16; i++) {
             sb.append(random.nextInt(10));
         }

@@ -99,7 +99,6 @@ public class Withdrawl extends JFrame implements ActionListener {
                 return;
             }
 
-
             if (dao.performDebitTransaction(pin, withdrawalAmount, "Withdrawal")) {
                 JOptionPane.showMessageDialog(null, withdrawalAmount + " CZK Debited Successfully.");
                 setVisible(false);

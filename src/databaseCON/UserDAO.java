@@ -4,6 +4,9 @@ import javax.swing.*;
 import javax.xml.crypto.Data;
 import java.sql.*;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class UserDAO {
 
@@ -17,13 +20,11 @@ public class UserDAO {
      */
     public boolean insertNewUserFromSignUp(User user) {
         // SQL query to insert all user details into the 'users' table.
-        // Ensure the column names here match your actual database table schema.
         String query = "INSERT INTO users (" +
                 "firstName, lastName, nationality, region, city, " +
                 "phoneNumber, email, gender, maritalStatus, pin, homeAddress, cardNumber" +
                 ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"; // 11 placeholders for 11 fields
 
-        // Using try-with-resources to ensure Connection and PreparedStatement are closed automatically
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement pstmt = con.prepareStatement(query)) {
 
@@ -57,7 +58,7 @@ public class UserDAO {
      * For a secure application, PINs should be hashed and salted.
      *
      * @param cardNum The card number provided by the user.
-     * @param PIN The PIN provided by the user.
+     * @param PIN     The PIN provided by the user.
      * @return true if the credentials are valid, false otherwise.
      */
     public boolean validateLogin(String cardNum, String PIN) {
@@ -99,6 +100,7 @@ public class UserDAO {
         }
         return balance;
     }
+
     /**
      * Updates the balance for a given card number.
      *
@@ -183,6 +185,7 @@ public class UserDAO {
     /**
      * Updates the PIN for a specific user identified by their current PIN.
      * This simplified version assumes the provided 'oldPin' is unique enough to find the user.
+     *
      * @param oldPin The user's current (old) PIN.
      * @param newPin The new PIN to set.
      * @return true if the PIN was successfully updated, false otherwise.
@@ -208,8 +211,8 @@ public class UserDAO {
      * It checks balance, updates the user's balance in the 'users' table,
      * and records the transaction in the 'bank' table.
      *
-     * @param pin The user's PIN (used to find the card number and for bank table).
-     * @param amount The amount to debit.
+     * @param pin             The user's PIN (used to find the card number and for bank table).
+     * @param amount          The amount to debit.
      * @param transactionType The type of transaction (e.g., "Withdrawal", "Fast Cash").
      * @return true if the debit is successful, false otherwise (e.g., insufficient balance, DB error).
      */
@@ -318,5 +321,49 @@ public class UserDAO {
     public boolean validateEmail(String email) {
         // email regex
         return email.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    public static class Transaction {
+        public String date;
+        public String type;
+        public double amount;
+
+        public Transaction(String date, String type, double amount) {
+            this.date = date;
+            this.type = type;
+            this.amount = amount;
+        }
+
+        // This method helps to easily print a Transaction object later
+        @Override
+        public String toString() {
+            return String.format("%s %-15s %.2f CZK", date, type, amount);
+        }
+    }
+
+    public List<Transaction> getTransactionHistory(String pin) {
+        List<Transaction> transactions = new ArrayList<>();
+        String query = "SELECT date, type, amount FROM bank WHERE pin = ? ORDER BY date DESC";
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(query)) {
+
+            pstmt.setString(1, pin);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    // Extract data for the current transaction from the ResultSet
+                    String date = rs.getString("date");
+                    String type = rs.getString("type");
+                    double amount = rs.getDouble("amount"); // Retrieve as double
+
+                    // Create a new Transaction object with the retrieved data and adds to the list
+                    Transaction tx = new Transaction(date, type, amount);
+                    transactions.add(tx);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("SQL Error retrieving transaction history: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return transactions;
     }
 }

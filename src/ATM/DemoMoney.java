@@ -1,6 +1,6 @@
 package ATM;
 
-import databaseCON.UserDAO; // Import UserDAO
+import databaseCON.UserDAO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -16,47 +16,59 @@ public class DemoMoney extends JFrame implements ActionListener {
     String pin;
     JTextField amountField;
     JButton generateButton, backButton;
-    UserDAO userDAO; // Declare UserDAO
+    UserDAO userDAO;
 
     public DemoMoney(String pin) {
         this.pin = pin;
-        this.userDAO = new UserDAO(); // Initialize UserDAO
+        this.userDAO = new UserDAO();
 
-        setTitle("Generate Initial Funds");
+        setTitle("Initial Account Funding");
+        getContentPane().setBackground(new Color(230, 240, 250)); // Light blue-grey background
+        setSize(600, 450); // Adjusted size for better layout
+        setLocationRelativeTo(null); // Center the window
         setLayout(null);
-        setSize(800, 400);
-        setLocation(400, 200);
-        getContentPane().setBackground(new Color(186, 35, 98));
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
+        // Main title label
         JLabel titleLabel = new JLabel("Initial Account Funding");
-        titleLabel.setFont(new Font("System", Font.BOLD, 25));
-        titleLabel.setForeground(Color.WHITE);
-        titleLabel.setBounds(250, 50, 400, 30);
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 28)); // Larger, modern font
+        titleLabel.setForeground(new Color(30, 60, 90)); // Dark blue-grey text
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER); // Center text
+        titleLabel.setBounds(0, 40, getWidth(), 35);
         add(titleLabel);
 
-        JLabel instructionLabel = new JLabel("Enter initial amount (min 500 CZK):");
-        instructionLabel.setFont(new Font("System", Font.PLAIN, 18));
-        instructionLabel.setForeground(Color.WHITE);
-        instructionLabel.setBounds(100, 120, 400, 25);
+        // Instruction label
+        JLabel instructionLabel = new JLabel("Enter amount (min 500 CZK):");
+        instructionLabel.setFont(new Font("Segoe UI", Font.PLAIN, 18)); // Clearer font
+        instructionLabel.setForeground(new Color(50, 50, 50)); // Darker grey for body text
+        instructionLabel.setBounds(80, 130, 350, 25);
         add(instructionLabel);
 
+        // Amount input field
         amountField = new JTextField();
-        amountField.setFont(new Font("Raleway", Font.BOLD, 22));
-        amountField.setBounds(450, 120, 200, 30);
+        amountField.setFont(new Font("Consolas", Font.BOLD, 20)); // Monospaced for numbers
+        amountField.setBounds(400, 130, 150, 35); // Adjusted size and position
+        amountField.setBorder(BorderFactory.createLineBorder(new Color(150, 150, 150))); // Subtle border
+        amountField.setHorizontalAlignment(JTextField.RIGHT); // Align text to the right
         add(amountField);
 
+        // Generate Funds button
         generateButton = new JButton("GENERATE FUNDS");
-        generateButton.setBackground(Color.BLACK);
+        generateButton.setBackground(new Color(0, 102, 102)); // Teal button
         generateButton.setForeground(Color.WHITE);
-        generateButton.setBounds(200, 200, 180, 40);
+        generateButton.setFont(new Font("Segoe UI", Font.BOLD, 16)); // Clear font
+        generateButton.setFocusPainted(false);
+        generateButton.setBounds(100, 250, 190, 45); // Larger button
         generateButton.addActionListener(this);
         add(generateButton);
 
+        // Back to ATM button
         backButton = new JButton("BACK TO ATM");
-        backButton.setBackground(Color.BLACK);
+        backButton.setBackground(new Color(65, 125, 128)); // Slightly different blue-green
         backButton.setForeground(Color.WHITE);
-        backButton.setBounds(400, 200, 180, 40);
+        backButton.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        backButton.setFocusPainted(false);
+        backButton.setBounds(310, 250, 190, 45); // Larger button
         backButton.addActionListener(this);
         add(backButton);
 
@@ -67,7 +79,7 @@ public class DemoMoney extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == backButton) {
             setVisible(false);
-            new ATM(pin); // Go back to ATM main menu
+            new ATM(pin);
         } else if (e.getSource() == generateButton) {
             String amountStr = amountField.getText();
 
@@ -88,7 +100,6 @@ public class DemoMoney extends JFrame implements ActionListener {
                 return;
             }
 
-            // Get card number using PIN
             String cardNumber = userDAO.getCardNumberByPin(pin);
 
             if (cardNumber == null) {
@@ -96,20 +107,16 @@ public class DemoMoney extends JFrame implements ActionListener {
                 return;
             }
 
-            // Get current balance
             double currentBalance = userDAO.getBalance(cardNumber);
-            if (currentBalance == -1.0) { // Check for error value
+            if (currentBalance == -1.0) {
                 JOptionPane.showMessageDialog(this, "Error: Could not retrieve current balance. Please try again.");
                 return;
             }
 
-            // Calculate new balance
             double newBalance = currentBalance + amount;
 
-            // Update balance in database
             if (userDAO.updateBalance(cardNumber, newBalance)) {
-                JOptionPane.showMessageDialog(this, "Funds generated successfully! Your new balance is: " + newBalance + " CZK");
-
+                JOptionPane.showMessageDialog(this, String.format("Funds generated successfully! Your new balance is: %.2f CZK", newBalance));
 
                 try (Connection con = databaseCON.DatabaseConnection.getConnection();
                      PreparedStatement pstmt = con.prepareStatement("INSERT INTO bank (pin, date, type, amount) VALUES (?, ?, ?, ?)")) {
@@ -118,9 +125,9 @@ public class DemoMoney extends JFrame implements ActionListener {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     String formattedDate = dateFormat.format(date);
 
-                    pstmt.setString(1, pin); // Use pin for the bank transaction table
+                    pstmt.setString(1, pin);
                     pstmt.setString(2, formattedDate);
-                    pstmt.setString(3, "Initial Deposit"); // Or "Fund Generation"
+                    pstmt.setString(3, "Initial Deposit");
                     pstmt.setDouble(4, amount);
                     pstmt.executeUpdate();
 

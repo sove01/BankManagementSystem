@@ -96,7 +96,6 @@ public class ChangePin extends JFrame implements ActionListener {
                 return;
             }
 
-            // Input validation for PIN format (e.g., 4 digits)
             if (newPin.length() != 4 || !newPin.matches("\\d{4}")) {
                 JOptionPane.showMessageDialog(this, "New PIN must be exactly 4 digits.");
                 return;

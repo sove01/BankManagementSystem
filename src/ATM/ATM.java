@@ -61,7 +61,7 @@ public class ATM extends JFrame implements ActionListener {
         add(bankStatementsButton);
 
         //demo money button
-        demoButton = new JButton("More");
+        demoButton = new JButton("demo money");
         demoButton.setBounds(884, 410, 50, 50);
         demoButton.setForeground(Color.BLACK);
         demoButton.addActionListener(this);

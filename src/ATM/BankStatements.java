@@ -1,119 +1,149 @@
 package ATM;
 
-import databaseCON.DatabaseConnection;
-
+import databaseCON.UserDAO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.List;
 
 public class BankStatements extends JFrame implements ActionListener {
-    String pin;
-    JButton button;
+    String cardNumber;
+    JButton backButton;
+    JTextArea transactionArea;
+    JLabel bankNameLabel, cardInfoLabel, balanceLabel;
+    UserDAO userDAO;
 
-    BankStatements(String pin) {
-        this.pin = pin;
-        getContentPane().setBackground(new Color(255, 204, 204));
-        setSize(400, 600);
-        setLocation(20, 20);
+    BankStatements(String cardNumber) {
+        this.cardNumber = cardNumber;
+        this.userDAO = new UserDAO();
+
+        setTitle("Bank Statements");
+        getContentPane().setBackground(new Color(230, 240, 250));
+        setSize(600, 750);
+        setLocationRelativeTo(null);
         setLayout(null);
 
-        JLabel label1 = new JLabel();
-        label1.setBounds(20, 140, 400, 200);
-        add(label1);
+        // bank name
+        bankNameLabel = new JLabel("Cong bank");
+        bankNameLabel.setFont(new Font("Segoe UI", Font.BOLD, 26));
+        bankNameLabel.setForeground(new Color(30, 60, 90));
+        bankNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        bankNameLabel.setBounds(0, 25, getWidth(), 35);
+        add(bankNameLabel);
 
-        JLabel label2 = new JLabel("TechCoder A.V");
-        label2.setFont(new Font("System", Font.BOLD, 15));
-        label2.setBounds(150, 20, 200, 20);
-        add(label2);
+        //Card Number Info
+        cardInfoLabel = new JLabel();
+        cardInfoLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        cardInfoLabel.setForeground(new Color(50, 50, 50));
+        cardInfoLabel.setBounds(40, 80, 500, 20);
+        add(cardInfoLabel);
 
-        JLabel label3 = new JLabel();
-        label3.setBounds(20, 80, 300, 20);
-        add(label3);
+        //separator Line
+        JSeparator separator1 = new JSeparator();
+        separator1.setBounds(30, 115, 540, 2);
+        separator1.setForeground(new Color(180, 180, 180));
+        add(separator1);
 
-        JLabel label4 = new JLabel();
-        label4.setBounds(20, 400, 300, 20);
-        add(label4);
+        // transaction history title
+        JLabel historyTitle = new JLabel("Transaction History:");
+        historyTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        historyTitle.setForeground(new Color(30, 60, 90));
+        historyTitle.setBounds(40, 135, 200, 25);
+        add(historyTitle);
 
-        try (Connection con = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = con.prepareStatement("SELECT card_number FROM login WHERE pin = ?")) {
+        // transaction area
+        transactionArea = new JTextArea();
+        transactionArea.setFont(new Font("Consolas", Font.PLAIN, 14));
+        transactionArea.setEditable(false);
+        transactionArea.setBackground(new Color(245, 250, 255));
+        transactionArea.setForeground(new Color(40, 40, 40));
+        transactionArea.setLineWrap(true);
+        transactionArea.setWrapStyleWord(true);
 
-            pstmt.setString(1, pin);
-            ResultSet resultSet = pstmt.executeQuery();
+        JScrollPane scrollPane = new JScrollPane(transactionArea);
+        scrollPane.setBounds(30, 170, 540, 400);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(150, 150, 150)));
+        add(scrollPane);
 
-            if (resultSet.next()) {
-                String fullCardNumber = resultSet.getString("card_number");
-                // only shows first and last 4 numbers of card
-                if (fullCardNumber != null && fullCardNumber.length() >= 16) {
-                    label3.setText("Card Number:  " + fullCardNumber.substring(0, 4) + "XXXXXXXX" + fullCardNumber.substring(12));
-                } else {
-                    label3.setText("Card Number:  " + fullCardNumber);
-                }
-            } else {
-                label3.setText("Card Number:  Not Found");
-            }
+        // separator line
+        JSeparator separator2 = new JSeparator();
+        separator2.setBounds(30, 590, 540, 2);
+        separator2.setForeground(new Color(180, 180, 180));
+        add(separator2);
 
-        } catch (SQLException e) {
-            System.err.println("SQL Error fetching card number: " + e.getMessage());
-            e.printStackTrace();
-            label3.setText("Card Number:  Error");
-        }
+        // current balance label
+        balanceLabel = new JLabel();
+        balanceLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        balanceLabel.setForeground(new Color(0, 128, 0));
+        balanceLabel.setBounds(40, 610, 500, 30);
+        add(balanceLabel);
 
-        // takes transactions and calculates balance
-        try (Connection con = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = con.prepareStatement("SELECT date, type, amount FROM bank WHERE pin = ?")) {
+        backButton = new JButton("Back to ATM");
+        backButton.setBounds(200, 660, 200, 45);
+        backButton.setBackground(new Color(65, 125, 128));
+        backButton.setForeground(Color.WHITE);
+        backButton.setFont(new Font("System", Font.BOLD, 18));
+        backButton.setFocusPainted(false); // No focus border
+        backButton.addActionListener(this);
+        add(backButton);
 
-            pstmt.setString(1, pin);
-            ResultSet resultSet = pstmt.executeQuery();
+        loadBankStatementData();
 
-            int balance = 0;
-            StringBuilder transactionHistory = new StringBuilder("<html>");
-
-            while (resultSet.next()) {
-                String date = resultSet.getString("date");
-                String type = resultSet.getString("type");
-                int amount = resultSet.getInt("amount"); // Get as int directly
-
-                transactionHistory.append(date).append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
-                        .append(type).append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
-                        .append(amount).append("<br><br>");
-
-                if (type.equals("Deposit")) {
-                    balance += amount;
-                } else {
-                    balance -= amount;
-                }
-            }
-            transactionHistory.append("</html>");
-            label1.setText(transactionHistory.toString()); // Set the accumulated text
-
-            label4.setText("Your Total Balance is CZK " + balance);
-        } catch (SQLException e) {
-            System.err.println("SQL Error fetching transactions/balance: " + e.getMessage());
-            e.printStackTrace();
-            label1.setText("<html>Error loading transactions.</html>"); // Display error in UI
-            label4.setText("Your Total Balance is Rs Error"); // Display error in UI
-        }
-
-        button = new JButton("Exit");
-        button.setBounds(20, 500, 100, 25);
-        button.addActionListener(this);
-        button.setBackground(Color.BLACK);
-        button.setForeground(Color.WHITE);
-        add(button);
-
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setVisible(true);
+    }
+
+    private void loadBankStatementData() {
+        String pinFromCard = userDAO.getCardNumberByPin(this.cardNumber);
+
+        if (pinFromCard == null) {
+            cardInfoLabel.setText("Card Number:  N/A (Error retrieving PIN)");
+            transactionArea.setText("Error: Could not retrieve user details for statements. Please ensure your account is valid.");
+            balanceLabel.setText("Current Balance: Error");
+            JOptionPane.showMessageDialog(this, "Error: Could not retrieve user details for statements.", "Data Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        //displays masked card
+        if (cardNumber != null && cardNumber.length() >= 16) {
+            // Mask all but first 4 and last 4
+            cardInfoLabel.setText("Card Number:  " + cardNumber.substring(0, 4) + " **** **** " + cardNumber.substring(12));
+        } else {
+            cardInfoLabel.setText("Card Number:  " + (cardNumber != null ? cardNumber : "N/A"));
+        }
+
+        //displays transaction history
+        List<UserDAO.Transaction> transactions = userDAO.getTransactionHistory(pinFromCard);
+
+        StringBuilder transactionText = new StringBuilder();
+        if (transactions.isEmpty()) {
+            transactionText.append("No transactions found for this account.");
+        } else {
+            transactionText.append(String.format("%-20s %-15s %s%n%n", "DATE", "TYPE", "AMOUNT (CZK)"));
+            for (UserDAO.Transaction tx : transactions) {
+                //format
+                transactionText.append(String.format("%-20s %-15s %.2f%n", tx.date, tx.type, tx.amount));
+            }
+        }
+        transactionArea.setText(transactionText.toString());
+        transactionArea.setCaretPosition(0);
+
+        //gets balance from users table
+        double currentBalance = userDAO.getBalance(this.cardNumber);
+        if (currentBalance == -1.0) {
+            balanceLabel.setText("Current Balance: Error");
+        } else {
+            balanceLabel.setText("Current Balance: " + String.format("%.2f", currentBalance) + " CZK");
+        }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == button){
+        if (e.getSource() == backButton) {
             setVisible(false);
+            new ATM(cardNumber);
         }
     }
-
 }
