@@ -154,6 +154,10 @@ public class SignUp extends JFrame implements ActionListener {
                 return;
             }
 
+            if (!pin.matches("\\d{4}")) {
+                JOptionPane.showMessageDialog(this, "PIN must be a 4-digit number.");
+                return;
+            }
             this.setVisible(false);
             new SignUp2(firstName, lastName, nationality, region, city, pin); // Pass to 2nd signUp
 

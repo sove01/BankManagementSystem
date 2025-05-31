@@ -1,5 +1,7 @@
 package ATM;
 
+import SignUps.Login;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -103,11 +105,10 @@ public class ATM extends JFrame implements ActionListener {
             new fastCash(pin);
             setVisible(false);
         } else if (e.getSource() == bankStatementsButton) {
-
-        } else if (e.getSource() == moreOptionsButton) {
-
+            new BankStatements(pin);
         } else if (e.getSource() == returnButton) {
-            System.exit(0);
+            this.dispose();
+            new Login();
         }
 
     }

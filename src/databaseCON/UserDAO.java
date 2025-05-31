@@ -21,8 +21,8 @@ public class UserDAO {
         // Ensure the column names here match your actual database table schema.
         String query = "INSERT INTO users (" +
                 "firstName, lastName, nationality, region, city, " +
-                "phoneNumber, email, gender, maritalStatus, pin, homeAddress" +
-                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"; // 11 placeholders for 11 fields
+                "phoneNumber, email, gender, maritalStatus, pin, homeAddress, cardNumber" +
+                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"; // 11 placeholders for 11 fields
 
         // Using try-with-resources to ensure Connection and PreparedStatement are closed automatically
         try (Connection con = DatabaseConnection.getConnection();
@@ -40,6 +40,7 @@ public class UserDAO {
             pstmt.setString(9, user.getMaritalStatus());
             pstmt.setString(10, user.getPin()); // security risk
             pstmt.setString(11, user.getHomeAddress());
+            pstmt.setString(12, user.getCardNumber());
 
             int rowsAffected = pstmt.executeUpdate();
             return rowsAffected > 0;
@@ -61,8 +62,7 @@ public class UserDAO {
      * @return true if the credentials are valid, false otherwise.
      */
     public boolean validateLogin(String cardNum, String PIN) {
-        //check for card and pin num
-        String query = "SELECT * FROM login WHERE card_number = ? AND pin = ?";
+        String query = "SELECT 1 FROM users WHERE cardNumber = ? AND pin = ?";
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement pstmt = con.prepareStatement(query)) {
             pstmt.setString(1, cardNum);

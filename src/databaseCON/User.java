@@ -12,10 +12,11 @@ public class User {
     private String maritalStatus;
     private String pin;
     private String homeAddress;
+    private String cardNumber;
 
 
     public User(String firstName, String lastName, String nationality, String region, String city,
-                String phoneNumber, String email, String gender, String maritalStatus, String pin, String homeAddress) {
+                String phoneNumber, String email, String gender, String maritalStatus, String pin, String homeAddress, String cardNumber) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.nationality = nationality;
@@ -27,6 +28,7 @@ public class User {
         this.maritalStatus = maritalStatus;
         this.pin = pin;
         this.homeAddress = homeAddress;
+        this.cardNumber = cardNumber;
     }
 
     public String getFirstName() { return firstName; }
@@ -40,5 +42,6 @@ public class User {
     public String getMaritalStatus() { return maritalStatus; }
     public String getPin() { return pin; }
     public String getHomeAddress() { return homeAddress; }
+    public String getCardNumber() { return cardNumber; }
 
 }

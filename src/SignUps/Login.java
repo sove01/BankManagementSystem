@@ -1,4 +1,5 @@
 package SignUps;
+
 import databaseCON.UserDAO;
 import ATM.ATM;
 
@@ -114,12 +115,9 @@ public class Login extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == button1) {
-
-
             String cardNum = cardNumber.getText();
             char[] pinChars = PIN.getPassword();
             String pin = new String(pinChars).trim(); // Convert char array to String and trim
-
             if (cardNum.isEmpty() || pin.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Please enter both Card Number and PIN.");
                 return;
@@ -138,9 +136,7 @@ public class Login extends JFrame implements ActionListener {
             //clear pin
             PIN.setText("");
 
-        } else if (e.getSource() == button2)
-
-        {
+        } else if (e.getSource() == button2) {
             cardNumber.setText(""); // Clear the card number field
             PIN.setText("");       // Clear the PIN field
         } else if (e.getSource() == button3) {
