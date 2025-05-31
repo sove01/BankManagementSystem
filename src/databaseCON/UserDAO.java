@@ -206,17 +206,15 @@ public class UserDAO {
      * @return true if the transaction was successful, false otherwise (e.g., insufficient funds, database error).
      */
     public boolean performDebitTransaction(String pin, double amount, String type) {
-        // String cardNumber = getCardNumberByPin(pin); // This line should be commented out or removed if no longer using cardNumber in UserDAO for balance
-
-        double currentBalance = getBalance(pin); // Correctly uses pin
+        double currentBalance = getBalance(pin);
         if (currentBalance == -1.0) {
             System.err.println("Error: Could not retrieve current balance for PIN: " + pin);
-            return false; // Error fetching balance or PIN not found
+            return false;
         }
 
         if (currentBalance < amount) {
             System.out.println("Insufficient funds for withdrawal. Current balance: " + currentBalance + ", requested: " + amount);
-            return false; // Insufficient funds, return false
+            return false;
         }
 
         double newBalance = currentBalance - amount;
@@ -224,10 +222,10 @@ public class UserDAO {
         Connection con = null;
         try {
             con = DatabaseConnection.getConnection();
-            con.setAutoCommit(false); // Start transaction for atomicity
+            con.setAutoCommit(false);
 
-            // 1. Update user's balance in the 'users' table using PIN
-            String updateBalanceQuery = "UPDATE users SET balance = ? WHERE pin = ?"; // Correctly uses pin
+
+            String updateBalanceQuery = "UPDATE users SET balance = ? WHERE pin = ?";
             try (PreparedStatement pstmt1 = con.prepareStatement(updateBalanceQuery)) {
                 pstmt1.setDouble(1, newBalance);
                 pstmt1.setString(2, pin);
@@ -238,7 +236,6 @@ public class UserDAO {
                 }
             }
 
-            // 2. Record transaction in the 'bank' table (this table should still use 'pin' as you had it)
             String insertTransactionQuery = "INSERT INTO bank (pin, date, type, amount) VALUES (?, ?, ?, ?)";
             try (PreparedStatement pstmt2 = con.prepareStatement(insertTransactionQuery)) {
                 Date date = new Date();
@@ -329,7 +326,6 @@ public class UserDAO {
             this.amount = amount;
         }
 
-        // This method helps to easily print a Transaction object later
         @Override
         public String toString() {
             return String.format("%s %-15s %.2f CZK", date, type, amount);
