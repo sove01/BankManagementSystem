@@ -8,7 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class ATM extends JFrame implements ActionListener {
-    JButton withdrawCashButton, depositCashButton, fastCashButton, checkBalanceButton, bankStatementsButton, PINChangeButton, moreOptionsButton, returnButton;
+    JButton withdrawCashButton, depositCashButton, fastCashButton, checkBalanceButton, bankStatementsButton, PINChangeButton, demoButton, returnButton;
     String pin;
 
     public ATM(String pin) {
@@ -60,12 +60,12 @@ public class ATM extends JFrame implements ActionListener {
         bankStatementsButton.addActionListener(this);
         add(bankStatementsButton);
 
-        //More options button
-        moreOptionsButton = new JButton("More");
-        moreOptionsButton.setBounds(884, 410, 50, 50);
-        moreOptionsButton.setForeground(Color.BLACK);
-        moreOptionsButton.addActionListener(this);
-        add(moreOptionsButton);
+        //demo money button
+        demoButton = new JButton("More");
+        demoButton.setBounds(884, 410, 50, 50);
+        demoButton.setForeground(Color.BLACK);
+        demoButton.addActionListener(this);
+        add(demoButton);
 
         //Change pin button
         PINChangeButton = new JButton("Pin Change");
@@ -106,6 +106,8 @@ public class ATM extends JFrame implements ActionListener {
             setVisible(false);
         } else if (e.getSource() == bankStatementsButton) {
             new BankStatements(pin);
+        } else if (e.getSource() == demoButton) {
+            new DemoMoney(pin);
         } else if (e.getSource() == returnButton) {
             this.dispose();
             new Login();

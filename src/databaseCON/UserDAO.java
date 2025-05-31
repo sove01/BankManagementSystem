@@ -78,6 +78,69 @@ public class UserDAO {
     }
 
     /**
+     * Retrieves the current balance for a given card number.
+     *
+     * @param cardNumber The user's card number.
+     * @return The current balance, or -1.0 if an error occurs or user not found.
+     */
+    public double getBalance(String cardNumber) {
+        double balance = -1.0; // Default error value
+        String query = "SELECT balance FROM users WHERE cardNumber = ?";
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(query)) {
+            pstmt.setString(1, cardNumber);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    balance = rs.getDouble("balance");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("SQL Error getting balance: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return balance;
+    }
+    /**
+     * Updates the balance for a given card number.
+     *
+     * @param cardNumber The user's card number.
+     * @param newBalance The new balance to set.
+     * @return true if the balance was successfully updated, false otherwise.
+     */
+    public boolean updateBalance(String cardNumber, double newBalance) {
+        String query = "UPDATE users SET balance = ? WHERE cardNumber = ?";
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(query)) {
+            pstmt.setDouble(1, newBalance);
+            pstmt.setString(2, cardNumber);
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.err.println("SQL Error updating balance: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public String getCardNumberByPin(String pin) {
+        String cardNumber = null;
+        String query = "SELECT cardNumber FROM users WHERE pin = ?";
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(query)) {
+            pstmt.setString(1, pin);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    cardNumber = rs.getString("cardNumber");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("SQL Error getting card number by PIN: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return cardNumber;
+    }
+
+    /**
      * Checks if a given email address is already registered in the 'users' table.
      *
      * @param email The email address to check.
